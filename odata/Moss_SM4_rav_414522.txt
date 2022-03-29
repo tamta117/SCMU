@@ -1,0 +1,2 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Delta Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin Path	File Offset (s)	Begin File	Species	Comments
+1	Spectrogram 1	1	121119.302986554	121121.553751113	2.2508	0.000	2250.000	D:\AI_SCMU\2021\Audio\Moss\SM4\4_14_21 to 5_22_21\Data\PWR04_20210428_091000.wav	39.3030	PWR04_20210428_091000.wav	U	
