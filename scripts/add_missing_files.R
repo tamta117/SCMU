@@ -6,17 +6,17 @@ library(tidyverse)
 library(lubridate)
 
 #import acoustic csv
-lava1_acoustic<-read.csv(here("odata/lava1_acoustic.csv"))
-lava2_acoustic<-read.csv(here("odata/lava2_acoustic.csv"))
-moss_acoustic<-read.csv(here("odata/moss_acoustic.csv"))
-pinnacle_acoustic<-read.csv(here("odata/pinnacle_acoustic.csv"))%>%
+lava1_cam<-read.csv(here("odata/lava1_cam.csv"))
+lava2_cam<-read.csv(here("odata/lava2_cam.csv"))
+moss_cam<-read.csv(here("odata/moss_cam.csv"))
+pinnacle_cam<-read.csv(here("odata/pinnacle_cam.csv"))%>%
   mutate(Murrelet=ifelse(Murrelet=="true",TRUE,FALSE))
-refuge_acoustic<-read.csv(here("odata/refuge_acoustic.csv"))%>%
+refuge_cam<-read.csv(here("odata/refuge_cam.csv"))%>%
   mutate(Murrelet=ifelse(Murrelet=="true",TRUE,FALSE))
 
 #join all acoustic files
-all_acoustic<-rbindlist(list(lava1_acoustic,lava2_acoustic,moss_acoustic,
-                        pinnacle_acoustic,refuge_acoustic))
+all_acoustic<-rbindlist(list(lava1_cam,lava2_cam,moss_cam,
+                        pinnacle_cam,refuge_cam))
 #filter for ravens
 raven_acoustic<-all_acoustic%>%
   subset(all_acoustic$Species=="Raven")
