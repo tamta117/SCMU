@@ -47,11 +47,13 @@ raven_cam<-raven_cam%>%
 lava1_det<-raven_cam%>%
   subset(Site=="Lava1")
 
-#create table of all wav
+#prepare wav files for lift off
 df<-unique(lava1_det$datetime_mp3)
 lava1_det_mp3<-as.data.table(df,TRUE)
 lava1_det_num<-as.numeric(lava1_det_mp3$df)
 lava1_det_mp3<-as.data.table(lava1_det_num,TRUE)
+
+#find +-10 minutes of each wav file
 lava1_det_plus<-lava1_det_mp3[,1]+1000
 lava1_det_minus<-lava1_det_mp3[,1]-1000
 lava1_det_mp3<-as.character(lava1_det_mp3$lava1_det_num)
@@ -60,11 +62,14 @@ lava1_det_plus<-as.character(lava1_det_plus$lava1_det_num)
 lava1_det_plus<-as.data.table(lava1_det_plus,TRUE)
 lava1_det_minus<-as.character(lava1_det_minus$lava1_det_num)
 lava1_det_minus<-as.data.table(lava1_det_minus,TRUE)
-colnames(lava1_det_plus)<-'lava1_det_mp3'
-colnames(lava1_det_minus)<-'lava1_det_mp3'
+
+#combine all 3 data tables
+colnames(lava1_det_mp3)<-'lava1'
+colnames(lava1_det_plus)<-'lava1'
+colnames(lava1_det_minus)<-'lava1'
 lava1_det_all<-rbindlist(list(lava1_det_mp3,lava1_det_plus,
                               lava1_det_minus))
-lava1_det_all<-unique(lava1_det_all$lava1_det_mp3)
+lava1_det_all<-unique(lava1_det_all$lava1)
 lava1_det_all<-as.data.table(lava1_det_all,TRUE)
 colnames(lava1_det_all)<-'lava1'
 
