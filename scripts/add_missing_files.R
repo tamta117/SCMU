@@ -47,8 +47,10 @@ raven_acoustic<-raven_acoustic%>%
 lava1_det<-raven_acoustic%>%
   subset(Site=="Lava1")
 
-#make it look like mp3 file format
+#make it look like wav file format
 lava1_det$datetime <- sub("^", "S4A04765_", lava1_det$datetime_mp3 )
 lava1_det$datetime <- paste0(lava1_det$datetime, ".wav")
+
+#create table of all wav
 df<-unique(lava1_det$datetime)
 lava1_det_mp3<-as.data.table(df,TRUE)
