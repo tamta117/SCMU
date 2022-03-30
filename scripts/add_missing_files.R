@@ -1,50 +1,50 @@
-#add in missing acoustic files to acoustic csv
+#add in missing failure files to cam
 library(here)
 library(dplyr)
 library(data.table)
 library(tidyverse)
 library(lubridate)
 
-#import acoustic csv
-lava1_cam<-read.csv(here("odata/lava1_cam.csv"))
-lava2_cam<-read.csv(here("odata/lava2_cam.csv"))
-moss_cam<-read.csv(here("odata/moss_cam.csv"))
-pinnacle_cam<-read.csv(here("odata/pinnacle_cam.csv"))%>%
+#import cam csv
+lava1_cam<-read.csv(here("odata/camera/lava1_cam.csv"))
+lava2_cam<-read.csv(here("odata/camera/lava2_cam.csv"))
+moss_cam<-read.csv(here("odata/camera/moss_cam.csv"))
+pinnacle_cam<-read.csv(here("odata/camera/pinnacle_cam.csv"))%>%
   mutate(Murrelet=ifelse(Murrelet=="true",TRUE,FALSE))
-refuge_cam<-read.csv(here("odata/refuge_cam.csv"))%>%
+refuge_cam<-read.csv(here("odata/camera/refuge_cam.csv"))%>%
   mutate(Murrelet=ifelse(Murrelet=="true",TRUE,FALSE))
 
-#join all acoustic files
-all_acoustic<-rbindlist(list(lava1_cam,lava2_cam,moss_cam,
+#join all cam files
+all_cam<-rbindlist(list(lava1_cam,lava2_cam,moss_cam,
                         pinnacle_cam,refuge_cam))
 #filter for ravens
-raven_acoustic<-all_acoustic%>%
-  subset(all_acoustic$Species=="Raven")
+raven_cam<-all_cam%>%
+  subset(all_cam$Species=="Raven")
 
 #change time format
-raven_acoustic$Time<-gsub(":","",as.character(raven_acoustic$Time))
-raven_acoustic$min1<-str_pad(raven_acoustic$Time, width=6, side="left", pad="0")
-raven_acoustic<-raven_acoustic%>%
+raven_cam$Time<-gsub(":","",as.character(raven_cam$Time))
+raven_cam$min1<-str_pad(raven_cam$Time, width=6, side="left", pad="0")
+raven_cam<-raven_cam%>%
   separate(`min1`,
          into=c("time1","min","time2"),
          sep=c(2,3), remove=FALSE)%>%
   select(-time2)
-raven_acoustic$min<-str_pad(raven_acoustic$min, width=4, side="right", pad="0")
-raven_acoustic<-raven_acoustic%>%
+raven_cam$min<-str_pad(raven_cam$min, width=4, side="right", pad="0")
+raven_cam<-raven_cam%>%
   unite("time_mp3",time1:min,remove=FALSE)
-raven_acoustic$time_mp3<-gsub("_","",as.character(raven_acoustic$time_mp3))
+raven_cam$time_mp3<-gsub("_","",as.character(raven_cam$time_mp3))
 
 #change date format
-raven_acoustic$date_mp3<-parse_date_time(raven_acoustic$Date, orders = c('ymd', 'mdy'),tz="")
-raven_acoustic$date_mp3<-gsub("-","",as.character(raven_acoustic$date_mp3))
+raven_cam$date_mp3<-parse_date_time(raven_cam$Date, orders = c('ymd', 'mdy'),tz="")
+raven_cam$date_mp3<-gsub("-","",as.character(raven_cam$date_mp3))
 
 #merge time and date
-raven_acoustic<-raven_acoustic%>%
+raven_cam<-raven_cam%>%
   select(-time1,-min,-min1)%>%
   unite("datetime_mp3",date_mp3:time_mp3,remove=FALSE)
 
 #filter for each site
-lava1_det<-raven_acoustic%>%
+lava1_det<-raven_cam%>%
   subset(Site=="Lava1")
 
 #make it look like wav file format
