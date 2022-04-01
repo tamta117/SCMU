@@ -1,0 +1,2 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Delta Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin Path	File Offset (s)	Begin File	Species	Comments
+3	Spectrogram 1	1	82.140800000	82.757446969	0.6166	2375.000	5115.789	D:\AI_SCMU\2021\Audio\Lava Bench 1\SM4\4_14_21 to 5_23_21\Data\S4A04765_20210419_181000.wav	22.1408	S4A04765_20210419_181000.wav	U	could be murrelets
