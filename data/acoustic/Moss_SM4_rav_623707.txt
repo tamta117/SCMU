@@ -1,1 +1,0 @@
-Selection	View	Channel	Begin Time (s)	End Time (s)	Delta Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin Path	File Offset (s)	Begin File	Species	Comments
