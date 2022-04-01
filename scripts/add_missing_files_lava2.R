@@ -84,6 +84,9 @@ lava2_det_n$ptime<-lava2_det_n[,4]+1000
 lava2_det_n$mtime<-lava2_det_n[,4]-1000
 lava2_det_n <- sapply( lava2_det_n, as.character )
 lava2_det_n<-as.data.table(lava2_det_n,TRUE)
+lava2_det_n$mtime<-substring(lava2_det_n$mtime, 2)
+lava2_det_n$ptime<-substring(lava2_det_n$ptime, 2)
+lava2_det_n$time_mp3<-substring(lava2_det_n$time_mp3, 2)
 lava2_det_np<-lava2_det_n%>%
   select(-time_mp3)%>%
   unite("datetime_mp3",date_mp3:ptime,remove=FALSE,sep="")%>%
