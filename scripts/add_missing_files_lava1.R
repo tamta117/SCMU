@@ -18,28 +18,31 @@ refuge_cam<-read.csv(here("data/camera/refuge_cam.csv"))%>%
 #join all cam files
 all_cam<-rbindlist(list(lava1_cam, lava2_cam, moss_cam,
                         pinnacle_cam, refuge_cam))
-#filter for ravens
+#filter for ravmurrs
 raven_cam<-all_cam%>%
   subset(all_cam$Species=="Raven")
+murr_cam<-all_cam%>%
+  subset(all_cam$Murrelet=="TRUE")
+ravmurr_cam<-bind_rows(raven_cam,murr_cam)
 
 #change time format
-raven_cam$Time<-gsub(":","",as.character(raven_cam$Time))
-raven_cam$min1<-str_pad(raven_cam$Time, width=6, side="left", pad="0")
-raven_cam<-raven_cam%>%
+ravmurr_cam$Time<-gsub(":","",as.character(ravmurr_cam$Time))
+ravmurr_cam$min1<-str_pad(ravmurr_cam$Time, width=6, side="left", pad="0")
+ravmurr_cam<-ravmurr_cam%>%
   separate(`min1`,
          into=c("time1","min","time2"),
          sep=c(2,3), remove=FALSE)%>%
   select(-time2)
-raven_cam$min<-str_pad(raven_cam$min, width=4, side="right", pad="0")
-raven_cam<-raven_cam%>%
+ravmurr_cam$min<-str_pad(ravmurr_cam$min, width=4, side="right", pad="0")
+ravmurr_cam<-ravmurr_cam%>%
   unite("time_mp3",time1:min,remove=FALSE, sep="")
 
 #change date format
-raven_cam$date_mp3<-parse_date_time(raven_cam$Date, orders = c('ymd', 'mdy'),tz="")
-raven_cam$date_mp3<-gsub("-","",as.character(raven_cam$date_mp3))
+ravmurr_cam$date_mp3<-parse_date_time(ravmurr_cam$Date, orders = c('ymd', 'mdy'),tz="")
+ravmurr_cam$date_mp3<-gsub("-","",as.character(ravmurr_cam$date_mp3))
 
 #filter for Lava1
-lava1_det<-raven_cam%>%
+lava1_det<-ravmurr_cam%>%
   subset(Site=="Lava1")
 
 #merge time and date + filter for 00 and 50 minutes
