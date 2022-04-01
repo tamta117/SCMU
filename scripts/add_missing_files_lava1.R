@@ -48,85 +48,110 @@ lava1_det<-ravmurr_cam%>%
 #merge time and date + filter for 00 and 50 minutes
 lava1_det_0<-lava1_det%>%
   subset(lava1_det$min=="0000")%>%
-  select(-min1,-time1,-min)%>%
   unite("datetime_mp3",date_mp3:time_mp3,remove=FALSE,sep="")
 lava1_det_5<-lava1_det%>%
   subset(lava1_det$min=="5000")%>%
-  select(-min1,-time1,-min)%>%
   unite("datetime_mp3",date_mp3:time_mp3,remove=FALSE,sep="")
 lava1_det_n<-lava1_det%>%
   subset(lava1_det$min!="5000" & lava1_det$min!="0000")%>%
-  select(-min1,-time1,-min)%>%
+  select(-time1,-min)%>%
   unite("datetime_mp3",date_mp3:time_mp3,remove=FALSE,sep="")
 
 #prepare wav files for lift off
-df<-unique(lava1_det_0$datetime_mp3)
-lava1_det_0<-as.data.table(df,TRUE)
-lava1_det_num<-as.numeric(lava1_det_0$df)
-lava1_det_0<-as.data.table(lava1_det_num,TRUE)
-
-#find +-10 minutes of each wav file
-lava1_det_0p<-lava1_det_0[,1]+1000
-lava1_det_0m<-lava1_det_0[,1]-5000
-lava1_det_0<-as.character(lava1_det_0$lava1_det_num)
+lava1_det_0<-distinct(lava1_det_0,datetime_mp3, .keep_all = TRUE)
+lava1_det_0<-lava1_det_0%>%select(time1,min,date_mp3,time_mp3)
+lava1_det_0$time_mp3<-sub("^", "1", lava1_det_0$time_mp3)
+lava1_det_0 <- sapply( lava1_det_0, as.numeric )
 lava1_det_0<-as.data.table(lava1_det_0,TRUE)
-lava1_det_0p<-as.character(lava1_det_0p$lava1_det_num)
-lava1_det_0p<-as.data.table(lava1_det_0p,TRUE)
-lava1_det_0m<-as.character(lava1_det_0m$lava1_det_num)
-lava1_det_0m<-as.data.table(lava1_det_0m,TRUE)
 
-#prepare wav files for lift off
-df<-unique(lava1_det_5$datetime_mp3)
-lava1_det_5<-as.data.table(df,TRUE)
-lava1_det_num<-as.numeric(lava1_det_5$df)
-lava1_det_5<-as.data.table(lava1_det_num,TRUE)
+lava1_det_5<-distinct(lava1_det_5,datetime_mp3, .keep_all = TRUE)
+lava1_det_5<-lava1_det_5%>%select(time1,min,date_mp3,time_mp3)
+lava1_det_5$time_mp3<-sub("^", "1", lava1_det_5$time_mp3)
+lava1_det_5 <- sapply( lava1_det_5, as.numeric )
+lava1_det_5<-as.data.table(lava1_det_5,TRUE)
 
 #find +-10 minutes of each wav file
-lava1_det_5p<-lava1_det_5[,1]+5000
-lava1_det_5m<-lava1_det_5[,1]-1000
-lava1_det_5<-as.character(lava1_det_5$lava1_det_num)
+lava1_det_0$mdate = ifelse(lava1_det_0$time1 %in% "0", 
+                       lava1_det_0$date_mp3-1,
+                       lava1_det_0$date_mp3*1)
+lava1_det_0$ptime<-lava1_det_0[,4]+1000
+lava1_det_00<-lava1_det_0%>%
+  subset(time1==0)
+lava1_det_0<-lava1_det_0%>%
+  subset(time1!=0)
+lava1_det_0$mtime<-lava1_det_0[,4]-5000
+lava1_det_00$mtime<-lava1_det_00[,4]+235000
+lava1_det_0<-bind_rows(lava1_det_0,lava1_det_00)
+lava1_det_0$time_mp3<-format(lava1_det_0$time_mp3, 
+                              scientific = FALSE, 
+                              trim = TRUE)
+lava1_det_0 <- sapply( lava1_det_0, as.character )
+lava1_det_0<-as.data.table(lava1_det_0,TRUE)
+lava1_det_0$mtime<-substring(lava1_det_0$mtime, 2)
+lava1_det_0$ptime<-substring(lava1_det_0$ptime, 2)
+lava1_det_0$time_mp3<-substring(lava1_det_0$time_mp3, 2)
+lava1_det_0m<-lava1_det_0%>%
+  select(-ptime)%>%
+  unite("datetime_mp3",mdate:mtime,remove=FALSE,sep="")%>%
+  select(datetime_mp3)
+lava1_det_0p<-lava1_det_0%>%
+  select(-time_mp3,-mdate)%>%
+  unite("datetime_mp3",date_mp3:ptime,remove=FALSE,sep="")%>%
+  select(datetime_mp3)
+lava1_det_0<-lava1_det_0%>%
+  unite("datetime_mp3",date_mp3:time_mp3,remove=FALSE,sep="")%>%
+  select(datetime_mp3)
+
+lava1_det_5$pdate = ifelse(lava1_det_5$time1 %in% "23", 
+                           lava1_det_5$date_mp3+1,
+                           lava1_det_5$date_mp3*1)
+lava1_det_5$ptime<-lava1_det_5[,4]+5000
+lava1_det_5$mtime<-lava1_det_5[,4]-1000
+lava1_det_5 <- sapply( lava1_det_5, as.character )
 lava1_det_5<-as.data.table(lava1_det_5,TRUE)
-lava1_det_5p<-as.character(lava1_det_5p$lava1_det_num)
-lava1_det_5p<-as.data.table(lava1_det_5p,TRUE)
-lava1_det_5m<-as.character(lava1_det_5m$lava1_det_num)
-lava1_det_5m<-as.data.table(lava1_det_5m,TRUE)
+lava1_det_5$mtime<-substring(lava1_det_5$mtime, 2)
+lava1_det_5$ptime<-substring(lava1_det_5$ptime, 2)
+lava1_det_5$time_mp3<-substring(lava1_det_5$time_mp3, 2)
+lava1_det_5p<-lava1_det_5%>%
+  unite("datetime_mp3",pdate:ptime,remove=FALSE,sep="")%>%
+  select(datetime_mp3)
+lava1_det_5m<-lava1_det_5%>%
+  select(-time_mp3,-pdate,-ptime)%>%
+  unite("datetime_mp3",date_mp3:mtime,remove=FALSE,sep="")%>%
+  select(datetime_mp3)
+lava1_det_5<-lava1_det_5%>%
+  unite("datetime_mp3",date_mp3:time_mp3,remove=FALSE,sep="")%>%
+  select(datetime_mp3)
+  
 
 #prepare wav files for lift off
-df<-unique(lava1_det_n$datetime_mp3)
-lava1_det_n<-as.data.table(df,TRUE)
-lava1_det_num<-as.numeric(lava1_det_n$df)
+lava1_det_n<-distinct(lava1_det_n,datetime_mp3)
+lava1_det_num<-as.numeric(lava1_det_n$datetime_mp3)
 lava1_det_n<-as.data.table(lava1_det_num,TRUE)
 
 #find +-10 minutes of each wav file
-lava1_det_np<-lava1_det_n[,1]+1000
-lava1_det_nm<-lava1_det_n[,1]-1000
-lava1_det_n<-as.character(lava1_det_n$lava1_det_num)
+lava1_det_n$pdatetime<-lava1_det_n[,1]+1000
+lava1_det_n$mdatetime<-lava1_det_n[,1]-1000
+lava1_det_n$mdatetime<-format(lava1_det_n$mdatetime, 
+                                  scientific = FALSE, 
+                                  trim = TRUE)
+lava1_det_n <- sapply( lava1_det_n, as.character )
 lava1_det_n<-as.data.table(lava1_det_n,TRUE)
-lava1_det_np<-as.character(lava1_det_np$lava1_det_num)
-lava1_det_np<-as.data.table(lava1_det_np,TRUE)
-lava1_det_nm<-as.character(lava1_det_nm$lava1_det_num)
-lava1_det_nm<-as.data.table(lava1_det_nm,TRUE)
+lava1_det_np<-lava1_det_n%>%
+  select(pdatetime)
+colnames(lava1_det_np)<-"datetime_mp3"
+lava1_det_nm<-lava1_det_n%>%
+  select(mdatetime)
+colnames(lava1_det_nm)<-"datetime_mp3"
+lava1_det_n<-lava1_det_n%>%
+  select(lava1_det_num)
+colnames(lava1_det_n)<-"datetime_mp3"
 
 #combine all data tables
-colnames(lava1_det_0)<-'lava1'
-colnames(lava1_det_0p)<-'lava1'
-colnames(lava1_det_0m)<-'lava1'
-colnames(lava1_det_5)<-'lava1'
-colnames(lava1_det_5p)<-'lava1'
-colnames(lava1_det_5m)<-'lava1'
-colnames(lava1_det_n)<-'lava1'
-colnames(lava1_det_np)<-'lava1'
-colnames(lava1_det_nm)<-'lava1'
-lava1_det_0all<-rbindlist(list(lava1_det_0,lava1_det_0p,
-                              lava1_det_0m))
-lava1_det_5all<-rbindlist(list(lava1_det_5,lava1_det_5p,
-                               lava1_det_5m))                          
-lava1_det_nall<-rbindlist(list(lava1_det_n,lava1_det_np,
-                                lava1_det_nm))
-lava1_det_all<-rbindlist(list(lava1_det_0all,lava1_det_5all,
-                               lava1_det_nall))
-lava1_det_all<-unique(lava1_det_all$lava1)
-lava1_det_all<-as.data.table(lava1_det_all,TRUE)
+lava1_det_all<-bind_rows(lava1_det_0m,lava1_det_5m,lava1_det_nm,
+                         lava1_det_0p,lava1_det_5p,lava1_det_np,
+                         lava1_det_0,lava1_det_5,lava1_det_n)
+lava1_det_all<-distinct(lava1_det_all,datetime_mp3)
 colnames(lava1_det_all)<-'Begin.File'
 
 #make it look like wav file format
