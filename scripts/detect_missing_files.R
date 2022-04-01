@@ -7,13 +7,12 @@ library(data.table)
 d1 <- read.delim(here("data", "acoustic", "Lava1_SM4_rav_210320.txt"))
 d2 <- read.delim(here("data", "acoustic", "Lava1_SM4_rav_320414.txt"))
 d3 <- read.delim(here("data", "acoustic", "Lava1_SM4_rav_414523.txt"))
-
-#filter for raven in d1
-d1<-d1%>%
-  subset(Species=="R")
+d4 <- read.delim(here("data", "acoustic", "Lava1_SM4_mur_210320.txt"))
+d5 <- read.delim(here("data", "acoustic", "Lava1_SM4_mur_320414.txt"))
+d6 <- read.delim(here("data", "acoustic", "Lava1_SM4_mur_414523.txt"))
 
 #combine data
-lava1_acoustic <- bind_rows(d1, d2, d3)
+lava1_acoustic <- bind_rows(d1, d2, d3, d4, d5, d6)
 
 #find unique values
 lava1_acoustic<-unique(lava1_acoustic$Begin.File)
