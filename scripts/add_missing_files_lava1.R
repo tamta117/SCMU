@@ -1,4 +1,4 @@
-#add in missing failure files to cam
+#find all processed wav files in lava1
 library(here)
 library(dplyr)
 library(data.table)
