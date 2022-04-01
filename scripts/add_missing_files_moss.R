@@ -85,6 +85,9 @@ moss_det_5<-moss_det_5%>%
 
 moss_det_n$ptime<-moss_det_n[,4]+1000
 moss_det_n$mtime<-moss_det_n[,4]-1000
+moss_det_n$mtime<-format(moss_det_n$mtime, 
+                              scientific = FALSE, 
+                              trim = TRUE)
 moss_det_n <- sapply( moss_det_n, as.character )
 moss_det_n<-as.data.table(moss_det_n,TRUE)
 moss_det_n$mtime<-substring(moss_det_n$mtime, 2)
