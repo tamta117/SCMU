@@ -43,7 +43,7 @@ ravmurr_cam$date_mp3<-gsub("-","",as.character(ravmurr_cam$date_mp3))
 
 #filter for Lava1
 lava1_det<-ravmurr_cam%>%
-  subset(Site=="Lava1")
+  subset(Site=="Lava1" & date_mp3<20210523)
 
 #merge time and date + filter for 00 and 50 minutes
 lava1_det_0<-lava1_det%>%
@@ -152,9 +152,11 @@ lava1_det_all<-bind_rows(lava1_det_0m,lava1_det_5m,lava1_det_nm,
                          lava1_det_0p,lava1_det_5p,lava1_det_np,
                          lava1_det_0,lava1_det_5,lava1_det_n)
 lava1_det_all<-distinct(lava1_det_all,datetime_mp3)
-colnames(lava1_det_all)<-'Begin.File'
+colnames(lava1_det_all)<-'Begin File'
 
 #make it look like wav file format
-lava1_det_all$Begin.File <- sub("^", "S4A04765_", lava1_det_all$Begin.File)
-lava1_det_all$Begin.File <- paste0(lava1_det_all$Begin.File, ".wav")
-stri_sub(lava1_det_all$Begin.File, 18, 17) <- "_"
+lava1_det_all$`Begin File` <- sub("^", "S4A04765_", lava1_det_all$`Begin File`)
+lava1_det_all$`Begin File` <- paste0(lava1_det_all$`Begin File`, ".wav")
+stri_sub(lava1_det_all$`Begin File`, 18, 17) <- "_"
+lava1_det_all$`Begin File`<-gsub("240000", "000000",
+                    as.character(lava1_det_all$`Begin File`))
