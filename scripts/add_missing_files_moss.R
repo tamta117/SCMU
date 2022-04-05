@@ -73,10 +73,10 @@ moss_det_5$ptime<-substring(moss_det_5$ptime, 2)
 moss_det_5$time_mp3<-substring(moss_det_5$time_mp3, 2)
 moss_det_5p<-moss_det_5%>%
   select(-time_mp3)%>%
-  unite("datetime_mp3",date_mp3:ptime,remove=FALSE,sep="")%>%
+  unite("datetime_mp3",pdate:ptime,remove=FALSE,sep="")%>%
   select(datetime_mp3)
 moss_det_5m<-moss_det_5%>%
-  select(-time_mp3,-ptime)%>%
+  select(-time_mp3,-ptime,-pdate)%>%
   unite("datetime_mp3",date_mp3:mtime,remove=FALSE,sep="")%>%
   select(datetime_mp3)
 moss_det_5<-moss_det_5%>%
