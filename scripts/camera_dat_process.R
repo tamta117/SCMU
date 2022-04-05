@@ -1,0 +1,149 @@
+## Script to process camera data for model
+## 5 April 2022
+
+## load libraries
+library(tidyverse)
+library(here)
+library(lubridate)
+library(janitor)
+
+## load raw data files from Timelapse
+lava1 <-
+  list.files(path = here("data", "camera", "Lava1"),
+             pattern = "*.csv", 
+             full.names = T) %>% 
+  map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
+  dplyr::select(-c("...27")) %>%
+  mutate(Site = "Lava1") %>%
+  dplyr::select(Site, everything())
+
+lava2 <-
+  list.files(path = here("Data", "camera", "Lava2"),
+             pattern = "*.csv", 
+             full.names = T) %>% 
+  map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
+  dplyr::select(-c("...27")) %>%
+  mutate(Site = "Lava2") %>%
+  dplyr::select(Site, everything())
+
+moss <-
+  list.files(path = here("Data", "camera", "Moss"),
+             pattern = "*.csv", 
+             full.names = T) %>% 
+  map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
+  dplyr::select(-c("...27")) %>%
+  mutate(Site = "Moss") %>%
+  dplyr::select(Site, everything())
+
+pinnacle <-
+  list.files(path = here("Data", "camera", "Pinnacle"),
+             pattern = "*.csv", 
+             full.names = T) %>% 
+  map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
+  dplyr::select(-c("...27")) %>%
+  mutate(Site = "Pinnacle") %>%
+  dplyr::select(Site, everything())
+
+refuge <-
+  list.files(path = here("Data", "camera", "Refuge"),
+             pattern = "*.csv", 
+             full.names = T) %>% 
+  map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
+  dplyr::select(-c("...27")) %>%
+  mutate(Site = "Refuge") %>%
+  dplyr::select(Site, everything())
+
+## combine into one dataframe, one row per camera observation
+camera_raw_dat <- rbind(lava1, lava2, moss, pinnacle, refuge) %>%
+  mutate(Date = as_date(Date, format = "%d-%b-%Y"),
+         Adult = as.integer(Adult),
+         Offspring = as.integer(Offspring),
+         Count = as.integer(Count))
+
+## export csv with all camera observations (not cleaned)
+write.csv(camera_raw_dat, here("Data", "camera", "camera_raw_dat.csv"), row.names = FALSE)
+nrow(camera_raw_dat) # total observations/attempts
+
+## clean dataframe and reformat
+camera_dat_full <- camera_raw_dat %>%
+  clean_names() %>% 
+  unite(date, time, col = "date_time", sep=" ", remove = FALSE) %>% # combine date and time into timestamp
+  mutate(date_time = as_datetime(date_time, format = "%Y-%m-%d %H:%M:%S")) %>% # format timestamp as timestamp
+  mutate(ID = 1:nrow(camera_raw_dat),
+         year = year(date_time), # pull year from timestamp
+         month = month(date_time), # pull month
+         day = day(date_time), # pull day
+         jday = yday(date_time), # pull julian day
+         hour = hour(date_time), # pull hour
+         min = minute(date_time), # pull minute
+         sec = second(date_time), # pull second
+         image_type = ifelse(sec == 00, "timelapse", "motion"), # categorize image as timelapse or motion-activated based on second hand
+         int_diff = date_time - lag(date_time), # find interval between images taken
+         int_diff_secs = as.numeric(int_diff, units = 'mins'), # compute to seconds
+         murrelet_status = ifelse(murrelet == "true" & is.na(comments), "alive", # fix dead murrelets
+                                  ifelse(murrelet == "true" & str_detect(comments, "dead", negate = TRUE), "alive",
+                                         ifelse(murrelet == "true" & str_detect(comments,"dead"), "dead", NA)))) %>%
+  arrange(site, date_time) %>%
+  mutate(image_no = paste(year, site, ID, sep = "_"), # create unique image ID
+         #SCMU = ifelse(murrelet == "true" & murrelet_status == "alive", 1, 0), # give 1 if SCMU alive detected, otherwise 0
+         SCMU = case_when(murrelet == "true" & murrelet_status == "alive" ~ 1, TRUE ~ 0),
+         CORA = case_when(species == "Raven" ~ 1, TRUE ~ 0),
+         BNOW = case_when(species == "Barn owl" ~ 1, TRUE ~ 0),
+         PEEM = case_when(species == "Mouse" ~ 1, TRUE ~ 0),
+         predation = case_when(predation_event == "true" ~ 1, TRUE ~ 0),
+         detection = case_when(SCMU == 1 ~ 1, # any detection events get a 1 
+                               CORA == 1 ~ 1,
+                               BNOW == 1 ~ 1, 
+                               PEEM == 1 ~ 1,
+                               predation == 1 ~ 1, TRUE ~ 0)) %>% 
+  #mutate(burst = ifelse(int_diff_secs < 5, TRUE, FALSE)) %>% # filter out images if interval between them is <5 seconds (double-check this)
+  dplyr::select(folder, relative_path, file, image_no, site, date_time, date, time,
+                year, month, day, jday, hour, min, sec, image_type, everything())
+
+write.csv(camera_dat_full, here("data", "camera", "camera_dat_full.csv"), row.names = FALSE)
+
+## create slimmed down dataframe with detections in 10 minute windows
+camera_dat_sml <- camera_dat_full %>%
+  dplyr::select(image_no, site, date, time, date_time, year, month, day, jday, hour, min, sec, image_type, detection,
+                SCMU, CORA, BNOW, PEEM, predation)
+
+#write.csv(camera_dat, here("data", "camera", "camera_dat.csv"))
+
+## extract independent detections (set at 10 minutes, code from Sarah B. Bassing)
+dat <- camera_dat_sml %>%
+  dplyr::select(image_no, site, date_time, SCMU, CORA, BNOW, PEEM) %>%
+  pivot_longer(cols = c(SCMU, CORA, BNOW, PEEM), names_to = "species", values_to = "detection") %>%
+  filter(detection == 1) %>%
+  arrange(site, date_time)
+caps <- c()
+caps[1] <- 1
+for (i in 2:nrow(dat)){
+  if (dat$site[i-1] != dat$site[i]) caps[i] = i
+  else (if (dat$species[i-1] != dat$species[i]) caps[i] = i
+        else (if (difftime(dat$date_time[i], dat$date_time[i-1], units = c("mins")) > 10) caps[i] = i
+              else caps[i] = caps[i-1]))
+}
+
+caps <- as.factor(caps)
+
+#'  Add new column to larger data set
+capdata <- cbind(as.data.frame(dat), caps)
+
+#'  Retain only the first image from each unique detection event
+detect <- capdata %>%
+  group_by(caps) %>%
+  slice(1L) %>%
+  ungroup() %>%
+  dplyr::select(-c(caps)) %>%
+  group_by(image_no, site, date_time) %>%
+  pivot_wider(names_from = species, values_from = detection)
+
+
+## create new dataframe with detection info
+camera_dat <- camera_dat_sml %>%
+  dplyr::select(-c(detection, SCMU, CORA, BNOW, PEEM, predation)) %>%
+  full_join(detect, by = c("image_no", "site", "date_time")) %>%
+  replace(is.na(.), 0) # replace NA values with 0
+
+## export csv
+write.csv(camera_dat, here("data", "camera", "camera_dat.csv"))
