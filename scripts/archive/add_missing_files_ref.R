@@ -1,5 +1,5 @@
 #find all processed wav files in refuge
-libribrary(tidyverse)
+library(tidyverse)
 library(lubridate)
 library(stringi)
 
