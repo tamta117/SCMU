@@ -9,24 +9,22 @@ library(ggplot2)
 library(lme4)
 
 ## load data
-audio <- read.csv(here("data", "acoustic_dat.csv"))
-cam <- read.csv(here("data", "camera_dat_clean.csv"))
-murr_cam <- read.csv(here("data", "murr_detect.csv"))
-pred_cam <- read.csv(here("data", "pred_detect.csv"))
+#audio <- read.csv(here("data", "acoustic_dat.csv"))
+cam <- read.csv(here("data", "camera", "camera_dat.csv"))
 
 ## clean the audio data
-head(audio)
-colnames(audio)
-audio2 <- audio %>%
-  rename(time = begin_time_s) %>% # fix
-  mutate(det_type = c("acoustic"),
-         species = ifelse(species == "M", "murrelet",
-                          ifelse(species == "O", "other",
-                                 ifelse(species == "R", "raven", "unknown"))),
-         jday = c(NA),
-         hour = c(NA)) %>% # julian day
-  dplyr::select(year, jday, site, det_type, hour, species) 
-head(audio2)
+# head(audio)
+# colnames(audio)
+# audio2 <- audio %>%
+#   rename(time = begin_time_s) %>% # fix
+#   mutate(det_type = c("acoustic"),
+#          species = ifelse(species == "M", "murrelet",
+#                           ifelse(species == "O", "other",
+#                                  ifelse(species == "R", "raven", "unknown"))),
+#          jday = c(NA),
+#          hour = c(NA)) %>% # julian day
+#   dplyr::select(year, jday, site, det_type, hour, species) 
+# head(audio2)
 
 ## clean the camera data
 #head(cam)

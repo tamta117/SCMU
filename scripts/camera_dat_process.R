@@ -1,6 +1,10 @@
 ## Script to process camera data for model
 ## 5 April 2022
 
+## TODO
+# CORA and SCMU only
+# dataframe with all images (not just image set)
+
 ## load libraries
 library(tidyverse)
 library(here)
@@ -137,7 +141,6 @@ detect <- capdata %>%
   dplyr::select(-c(caps)) %>%
   group_by(image_no, site, date_time) %>%
   pivot_wider(names_from = species, values_from = detection)
-
 
 ## create new dataframe with detection info
 camera_dat <- camera_dat_sml %>%
