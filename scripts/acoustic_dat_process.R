@@ -7,75 +7,54 @@ library(here)
 library(lubridate)
 library(janitor)
 library(Rraven)
+library(data.table)
+library(stringi)
 
 ## read in acoustic txt files
-a1 <- read.csv(here("data", "acoustics", "Lava1_SM4_rav_210320.csv"), header = TRUE) %>%
-  mutate(site = "Lava1")
-a2 <- read.csv(here("data", "acoustics", "Lava1_SM4_rav_320414.csv"), header = TRUE) %>%
-  mutate(site = "Lava1")
-a3 <- read.csv(here("data", "acoustics", "Lava1_SM4_rav_414523.csv"), header = TRUE) %>%
-  mutate(site = "Lava1")
-a4 <- read.csv(here("data", "acoustics", "Lava2_SM4_rav_210319.csv"), header = TRUE) %>%
-  mutate(site = "Lava2")
-a5 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_210320.csv"), header = TRUE) %>%
-  mutate(site = "Moss")
-a6 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_320414.csv"), header = TRUE) %>%
-  mutate(site = "Moss")
-a7 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_414522.csv"), header = TRUE) %>%
-  mutate(site = "Moss") 
-a8 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_522623.csv"), header = TRUE) %>%
-  mutate(site = "Moss") 
-a9 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_623707.csv"), header = TRUE) %>%
-  mutate(site = "Moss") 
-a10 <- read.csv(here("data", "acoustics", "Pinnacle_SM4_rav_210319.csv"), header = TRUE) %>%
-  mutate(site = "Pinnacle")  
-a11 <- read.csv(here("data", "acoustics", "Pinnacle_SM4_rav_319414.csv"), header = TRUE) %>%
-  mutate(site = "Pinnacle")    
-a12 <- read.csv(here("data", "acoustics", "Pinnacle_SM4_rav_522623.csv"), header = TRUE) %>%
-  mutate(site = "Pinnacle")    
+#a1 <- read.csv(here("data", "acoustics", "Lava1_SM4_rav_210320.csv"), header = TRUE) %>%
+#   mutate(site = "Lava1")
+# #a2 <- read.csv(here("data", "acoustics", "Lava1_SM4_rav_320414.csv"), header = TRUE) %>%
+#   mutate(site = "Lava1")
+#a3 <- read.csv(here("data", "acoustics", "Lava1_SM4_rav_414523.csv"), header = TRUE) %>%
+#   mutate(site = "Lava1")
+# a4 <- read.csv(here("data", "acoustics", "Lava2_SM4_rav_210319.csv"), header = TRUE) %>%
+#   mutate(site = "Lava2")
+# a5 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_210320.csv"), header = TRUE) %>%
+#   mutate(site = "Moss")
+# a6 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_320414.csv"), header = TRUE) %>%
+#   mutate(site = "Moss")
+# a7 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_414522.csv"), header = TRUE) %>%
+#   mutate(site = "Moss") 
+# a8 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_522623.csv"), header = TRUE) %>%
+#   mutate(site = "Moss") 
+# a9 <- read.csv(here("data", "acoustics", "Moss_SM4_rav_623707.csv"), header = TRUE) %>%
+#   mutate(site = "Moss") 
+# a10 <- read.csv(here("data", "acoustics", "Pinnacle_SM4_rav_210319.csv"), header = TRUE) %>%
+#   mutate(site = "Pinnacle")  
+# a11 <- read.csv(here("data", "acoustics", "Pinnacle_SM4_rav_319414.csv"), header = TRUE) %>%
+#   mutate(site = "Pinnacle")    
+# a12 <- read.csv(here("data", "acoustics", "Pinnacle_SM4_rav_522623.csv"), header = TRUE) %>%
+#   mutate(site = "Pinnacle")    
 
 ## combine dataframes into one
 ## need to fix time and date
-adf <- bind_rows(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) %>%
-  clean_names() %>%
-  mutate(year = 2021,
-         month = c(NA),
-         day = c(NA)) %>%
-  dplyr::select(year, month, day, site, begin_time_s, end_time_s, delta_time_s, low_freq_hz, 
-                high_freq_hz, species, comments, begin_path, file_offset_s, begin_file)
+# adf <- bind_rows(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) %>%
+#   clean_names() %>%
+#   mutate(year = 2021,
+#          month = c(NA),
+#          day = c(NA)) %>%
+#   dplyr::select(year, month, day, site, begin_time_s, end_time_s, delta_time_s, low_freq_hz, 
+#                 high_freq_hz, species, comments, begin_path, file_offset_s, begin_file)
 
 #df$newDate <- as.POSIXct(as.Date(df$begin_time_s,origin="1899-12-30"))
 #convertToDateTime(helpData$ExcelNum, origin = "1900-01-01")
 #mutate(time = excel_numeric_to_date(as.numeric(as.character("begin_time_s")), date_system = "modern")) 
 
 ## export
-write.csv(adf, here("data", "acoustic_dat.csv"))
-
-## read in data
-lava1_acoustic<-imp_raven("data/acoustic/Lava1",all.data=TRUE)
-lava2_acoustic<-imp_raven("data/acoustic/Lava2",all.data=TRUE)
-lava2_acoustic$`Begin File`<-gsub("PWR04", "PWR01",
-                                  as.character(lava2_acoustic$`Begin File`))
-moss_acoustic<-imp_raven("data/acoustic/Moss",all.data=TRUE)
-pinn_acoustic<-imp_raven("data/acoustic/Pinnacle",all.data=TRUE)
-ref_acoustic<-imp_raven("data/acoustic/Refuge",all.data=TRUE)
-
-## find unique values
-lava1_acoustic<-distinct(lava1_acoustic,`Begin File`)
-lava2_acoustic<-distinct(lava2_acoustic,`Begin File`)
-moss_acoustic<-distinct(moss_acoustic,`Begin File`)
-pinn_acoustic<-distinct(pinn_acoustic,`Begin File`)
-ref_acoustic<-distinct(ref_acoustic,`Begin File`)
-
-## anti_join commences
-lava1_non_det <- anti_join(lava1_det_all ,lava1_acoustic, by = "Begin File")
-lava2_non_det <- anti_join(lava2_det_all ,lava2_acoustic, by = "Begin File")
-moss_non_det <- anti_join(moss_det_all ,moss_acoustic, by = "Begin File")
-pinn_non_det <- anti_join(pinn_det_all ,pinn_acoustic, by = "Begin File")
-ref_non_det <- anti_join(ref_det_all ,ref_acoustic, by = "Begin File")
+#write.csv(adf, here("data", "acoustic_dat.csv"))
 
 ## make acoustic csv
-camera_org<-read.csv("odata\\camera_dat.csv")
+camera_org<-read.csv("data/camera/camera_dat.csv")
 camera_acoustic = subset(camera_org, select=c(-ImageQuality, -DeleteFlag, -CameraLocation,
                                               -StartDate, -TechnicianName, -Service, -Empty, 
                                               -Human, -HumanActivity, -Tags, -GoodPicture,
@@ -95,12 +74,12 @@ write.csv(camera_refuge,"odata\\refuge_acoustic.csv", row.names=FALSE)
 
 #### Add missing files Lava 1 ####
 #import cam csv
-lava1_cam<-read.csv(here("data/camera/lava1_cam.csv"))
-lava2_cam<-read.csv(here("data/camera/lava2_cam.csv"))
-moss_cam<-read.csv(here("data/camera/moss_cam.csv"))
-pinnacle_cam<-read.csv(here("data/camera/pinnacle_cam.csv"))%>%
+lava1_cam<-read.csv(here("data/camera/archive/lava1_cam.csv"))
+lava2_cam<-read.csv(here("data/camera/archive/lava2_cam.csv"))
+moss_cam<-read.csv(here("data/camera/archive/moss_cam.csv"))
+pinnacle_cam<-read.csv(here("data/camera/archive/pinnacle_cam.csv"))%>%
   mutate(Murrelet=ifelse(Murrelet=="true",TRUE,FALSE))
-refuge_cam<-read.csv(here("data/camera/refuge_cam.csv"))%>%
+refuge_cam<-read.csv(here("data/camera/archive/refuge_cam.csv"))%>%
   mutate(Murrelet=ifelse(Murrelet=="true",TRUE,FALSE))
 
 #join all cam files
@@ -473,7 +452,7 @@ moss_det_all$`Begin File` <- sub("^", "PWR04_", moss_det_all$`Begin File`)
 moss_det_all$`Begin File` <- paste0(moss_det_all$`Begin File`, ".wav")
 stri_sub(moss_det_all$`Begin File`, 15, 14) <- "_"
 
-#### Add missing files for Pinnacle ####
+#### Add missing files Pinnacle ####
 #filter for pinnacle
 pinn_det<-ravmurr_cam%>%
   subset(Site=="Pinnacle")%>%
@@ -587,7 +566,7 @@ pinn_det_all$`Begin File` <- sub("^", "PWR05_", pinn_det_all$`Begin File`)
 pinn_det_all$`Begin File` <- paste0(pinn_det_all$`Begin File`, ".wav")
 stri_sub(pinn_det_all$`Begin File`, 15, 14) <- "_"
 
-#### Add missing files for Refuge ####
+#### Add missing files Refuge ####
 #filter for refuge
 ref_det<-ravmurr_cam%>%
   subset(Site=="Refuge")%>%
@@ -691,4 +670,69 @@ ref_det_all$`Begin File` <- sub("^", "S4A07766_", ref_det_all$`Begin File`)
 ref_det_all$`Begin File` <- paste0(ref_det_all$`Begin File`, ".wav")
 stri_sub(ref_det_all$`Begin File`, 18, 17) <- "_"
 
+####anti_join and combine all acoustic data####
+## read in data
+lava1_dir<-imp_raven("data/acoustic/Lava1",all.data=TRUE)
+lava1_dir$site<-"Lava1"
+lava2_dir<-imp_raven("data/acoustic/Lava2",all.data=TRUE)
+lava2_dir$`Begin File`<-gsub("PWR04", "PWR01",
+                             as.character(lava2_dir$`Begin File`))
+lava2_dir$site<-"Lava2"
+moss_dir<-imp_raven("data/acoustic/Moss",all.data=TRUE)
+moss_dir$site<-"Moss"
+pinn_dir<-imp_raven("data/acoustic/Pinnacle",all.data=TRUE)
+pinn_dir$site<-"Pinnacle"
+ref_dir<-imp_raven("data/acoustic/Refuge",all.data=TRUE)
+ref_dir$site<-"Refuge"
 
+## find unique values
+lava1_acoustic<-distinct(lava1_dir,`Begin File`)
+lava2_acoustic<-distinct(lava2_dir,`Begin File`)
+moss_acoustic<-distinct(moss_dir,`Begin File`)
+pinn_acoustic<-distinct(pinn_dir,`Begin File`)
+ref_acoustic<-distinct(ref_dir,`Begin File`)
+
+## anti_join commences
+lava1_non_det <- anti_join(lava1_det_all ,lava1_acoustic, by = "Begin File")
+lava2_non_det <- anti_join(lava2_det_all ,lava2_acoustic, by = "Begin File")
+moss_non_det <- anti_join(moss_det_all ,moss_acoustic, by = "Begin File")
+pinn_non_det <- anti_join(pinn_det_all ,pinn_acoustic, by = "Begin File")
+ref_non_det <- anti_join(ref_det_all ,ref_acoustic, by = "Begin File")
+
+lava1_non_det$site<-"Lava1"
+lava2_non_det$site<-"Lava2"
+moss_non_det$site<-"Moss"
+pinn_non_det$site<-"Pinnacle"
+ref_non_det$site<-"Refuge"
+
+lava1_non_det$Species<-"N"
+lava2_non_det$Species<-"N"
+moss_non_det$Species<-"N"
+pinn_non_det$Species<-"N"
+ref_non_det$Species<-"N"
+
+#combine all processed acoustic tables
+acoustic_dir<-rbindlist(list(lava1_dir,lava2_dir,moss_dir,pinn_dir,
+                             ref_dir,lava1_non_det,lava2_non_det,
+                             moss_non_det,pinn_non_det,ref_non_det),
+                        fill=TRUE)
+
+#emulate camera_dat table
+acoustic_cam<-acoustic_dir%>%
+  select(`Begin File`, Species, site)%>%
+  distinct(`Begin File`,.keep_all=TRUE)%>%
+  separate(`Begin File`,
+           into=c("ex1","yr","mnth","d","ex2","hr","min","sec","ex3"),
+           sep=c(-19,-15,-13,-11,-10,-8,-6,-4),remove=FALSE)%>%
+  select(-ex1,-ex2,-ex3)%>%
+  unite(c(yr,mnth,d),col=date,sep="-",remove=FALSE)%>%
+  unite(c(hr,min,sec),col=time,sep=":",remove=FALSE)%>%
+  unite(date,time,col=date_time,sep=" ",remove=FALSE)%>%
+  mutate(date_time = as_datetime(date_time, format = "%Y-%m-%d %H:%M:%S"))%>%
+  mutate(jday = yday(date_time),
+         SCMU=case_when(Species=="M"~1,TRUE~0),
+         CORA=case_when(Species=="R"~1,TRUE~0))%>%
+  select(`Begin File`,site,date,time,date_time,yr,mnth,d,jday,
+         hr,min,sec,SCMU,CORA)
+
+write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.csv"))
