@@ -4,6 +4,7 @@
 ## TODO
 # CORA and SCMU only
 # dataframe with all images (not just image set)
+# fix loop for detect_type difference
 
 ## load libraries
 library(tidyverse)
