@@ -53,7 +53,7 @@ library(stringi)
 ## export
 #write.csv(adf, here("data", "acoustic_dat.csv"))
 
-## make acoustic csv
+#### Make acoustic csv ####
 camera_org<-read.csv("data/camera/camera_dat.csv")
 camera_acoustic = subset(camera_org, select=c(-ImageQuality, -DeleteFlag, -CameraLocation,
                                               -StartDate, -TechnicianName, -Service, -Empty, 
