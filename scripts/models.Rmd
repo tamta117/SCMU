@@ -7,6 +7,7 @@ output: pdf_document
 
 # TODO
 # chunk time in periods (dawn/dusk)
+## dawn period (00:00-07:00), day (07:01-17:00), dusk period (17:01-11:59)
 # create camera ID for random effect (cam 1-7)
 
 ```{r setup, include=FALSE}
