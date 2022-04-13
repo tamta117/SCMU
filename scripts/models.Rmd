@@ -1,0 +1,39 @@
+---
+title: "Models"
+author: "Tam Ta & Amelia J. DuVall"
+date: "4/13/2022"
+output: pdf_document
+---
+
+# TODO
+# chunk time in periods (dawn/dusk)
+# create camera ID for random effect (cam 1-7)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+## load libraries
+library(tidyverse)
+library(here)
+library(lme4)
+
+## load data
+cam <- read.csv(here("data", "camera", "camera_dat.csv")) %>%
+  arrange(jday)
+# acoustic <- 
+```
+
+## Model #1: SCMU Camera Detections
+```{r mod1}
+m1 <- glm(SCMU ~ image_type + hour + jday + jday^2, data = cam, family = binomial)
+summary(m1)
+```
+### time as quadratic function
+```{r time}
+x <- 1:12
+x2 <- x^2
+
+plot(x + x2)
+
+
+```

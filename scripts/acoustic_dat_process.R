@@ -54,12 +54,14 @@ library(stringi)
 #write.csv(adf, here("data", "acoustic_dat.csv"))
 
 #### Make acoustic csv ####
+### NEED TO TWEAK CODE
 camera_org<-read.csv("data/camera/camera_dat.csv")
-camera_acoustic = subset(camera_org, select=c(-ImageQuality, -DeleteFlag, -CameraLocation,
-                                              -StartDate, -TechnicianName, -Service, -Empty, 
-                                              -Human, -HumanActivity, -Tags, -GoodPicture,
-                                              -Folder))
-camera_acoustic=subset(camera_acoustic, Animal=="true")
+# camera_acoustic = subset(camera_org, select=c(-ImageQuality, -DeleteFlag, -CameraLocation,
+#                                               -StartDate, -TechnicianName, -Service, -Empty, 
+#                                               -Human, -HumanActivity, -Tags, -GoodPicture,
+#                                               -Folder))
+camera_acoustic <- camera_org
+camera_acoustic <- subset(camera_acoustic, Animal=="true")
 camera_lava1=subset(camera_acoustic, Site=="Lava1")
 camera_lava2=subset(camera_acoustic, Site=="Lava2")
 camera_moss=subset(camera_acoustic, Site=="Moss")
@@ -72,8 +74,7 @@ write.csv(camera_moss,"odata\\moss_acoustic.csv", row.names=FALSE)
 write.csv(camera_pinnacle,"odata\\pinnacle_acoustic.csv", row.names=FALSE)
 write.csv(camera_refuge,"odata\\refuge_acoustic.csv", row.names=FALSE)
 
-#### Add missing files Lava 1 ####
-#import cam csv
+## Read in cam csv with all detections from camera data by site 
 lava1_cam<-read.csv(here("data/camera/archive/lava1_cam.csv"))
 lava2_cam<-read.csv(here("data/camera/archive/lava2_cam.csv"))
 moss_cam<-read.csv(here("data/camera/archive/moss_cam.csv"))
