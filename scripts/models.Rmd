@@ -1,5 +1,5 @@
 ---
-title: "Models"
+title: "Murrelet & Raven Detection Models"
 author: "Tam Ta & Amelia J. DuVall"
 date: "4/13/2022"
 output: pdf_document
@@ -19,22 +19,17 @@ library(here)
 library(lme4)
 
 ## load data
-cam <- read.csv(here("data", "camera", "camera_dat.csv")) %>%
-  arrange(jday)
-# acoustic <- 
+camera_full <- read.csv(here("data", "camera_dat_all_images.csv")) 
+camera_set <- read.csv(here("data", "camera_dat_image_set.csv")) 
+acoustic <- read.csv(here("data", "acoustic", "acoustic_dat.csv")) 
 ```
 
 ## Model #1: SCMU Camera Detections
+
 ```{r mod1}
-m1 <- glm(SCMU ~ image_type + hour + jday + jday^2, data = cam, family = binomial)
+m1 <- glmer(SCMU ~ image_type + hour + jday + jday^2 + (1 | cam_id), 
+            data = camera_full, family = binomial)
 summary(m1)
 ```
-### time as quadratic function
-```{r time}
-x <- 1:12
-x2 <- x^2
 
-plot(x + x2)
-
-
-```
+## Model #2: CORA Camera Detections
