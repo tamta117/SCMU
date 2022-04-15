@@ -2,6 +2,7 @@
 ## 5 April 2022
 
 ## TODO
+# fix image set df to detections within 10 min window?
 
 ## load libraries
 library(tidyverse)
