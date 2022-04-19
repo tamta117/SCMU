@@ -737,3 +737,34 @@ acoustic_cam<-acoustic_dir%>%
          hr,min,sec,SCMU,CORA)
 
 write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.csv"))
+
+#### bin time into dusk and day ####
+acoustic_cam<-read.csv(here("data/acoustic/acoustic_cam.csv"))
+acoustic_cam$hr<-as.numeric(acoustic_cam$hr)
+acoustic_cam1<-acoustic_cam%>%
+  mutate(date = as_datetime(
+    date, format = "%Y-%m-%d"))%>%
+  subset(acoustic_cam$date<="2021-04-12")%>%
+  mutate(tod=case_when(
+    hr<=6~"dawn",
+    hr>=7 & hr<=17 ~ "day",
+    hr>=18~"dusk"))
+acoustic_cam2<-acoustic_cam%>%
+  mutate(date = as_datetime(
+    date, format = "%Y-%m-%d"))%>%
+  subset(acoustic_cam$date>="2021-04-13" & 
+           acoustic_cam$date<="2021-05-13")%>%
+  mutate(tod=case_when(
+    hr<=5~"dawn",
+    hr>=6 & hr<=17 ~ "day",
+    hr>=18~"dusk"))
+acoustic_cam3<-acoustic_cam%>%
+  mutate(date = as_datetime(
+    date, format = "%Y-%m-%d"))%>%
+  subset(acoustic_cam$date>="2021-05-14")%>%
+  mutate(tod=case_when(
+    hr<=5~"dawn",
+    hr>=6 & hr<=18 ~ "day",
+    hr>=19~"dusk"))
+acoustic_cam<-bind_rows(acoustic_cam1,acoustic_cam2,acoustic_cam3)
+write_csv(acoustic_cam,here("data/acoustic/acoustic_cam_tod.csv"))
