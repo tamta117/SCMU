@@ -21,6 +21,7 @@ library(lme4)
 ## load data
 camera_full <- read.csv(here("data", "camera_dat_all_images.csv")) 
 camera_set <- read.csv(here("data", "camera_dat_image_set.csv")) 
+camera_hourly <- read.csv(here("data", "camera_hourly_det.csv"))
 acoustic <- read.csv(here("data", "acoustic", "acoustic_dat.csv")) 
 ```
 
