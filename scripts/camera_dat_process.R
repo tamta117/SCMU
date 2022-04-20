@@ -156,3 +156,16 @@ camera_dat_image_set <- camera_dat_all_images %>%
 
 ## export csv
 # write.csv(camera_dat_image_set, here("data", "camera_dat_image_set.csv"), row.names = FALSE)
+
+## create hourly detection data
+hourly_det <- camera_dat_image_set %>%
+  dplyr::select(site, cam_id, date, jday, hour, image_type, SCMU, CORA) %>%
+  group_by(site, cam_id, date, hour, image_type) %>%
+  mutate(SCMU_hourly_det = ifelse(any(SCMU == 1), 1, 0),
+         CORA_hourly_det = ifelse(any(CORA == 1), 1, 0)) %>%
+  group_by(site, cam_id, date, hour, image_type) %>%
+  slice(1L) %>%
+  dplyr::select(site, cam_id, date, jday, hour, image_type, SCMU_hourly_det, CORA_hourly_det)
+
+## export csv
+# write.csv(hourly_det, here("data", "camera_hourly_det.csv"), row.names = FALSE)
