@@ -770,7 +770,7 @@ acoustic_cam3<-acoustic_cam%>%
 acoustic_cam4<-acoustic_cam%>%
   mutate(date = as_datetime(
     date, format = "%Y-%m-%d"))%>%
-  subset(acoustic_cam$date>="2021-05-30")%>%
+  subset(acoustic_cam$date>="2021-05-31")%>%
   mutate(tod=case_when(
     hr<=4~"dawn",
     hr>=5 & hr<=18 ~ "day",
