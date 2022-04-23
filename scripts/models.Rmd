@@ -28,9 +28,25 @@ acoustic <- read.csv(here("data", "acoustic", "acoustic_dat.csv"))
 ## Model #1: SCMU Camera Detections
 
 ```{r mod1}
-m1 <- glmer(SCMU ~ image_type + hour + jday + jday^2 + (1 | cam_id), 
-            data = camera_full, family = binomial)
+# test <- camera_hourly %>%
+#   mutate(tod = ifelse(tod == "day", "aday", tod))
+# m1 <- glmer(SCMU_hourly_det ~ image_type + tod + jday + jday^2 + (1 | cam_id), 
+#             data = test, family = binomial)
+
+m1 <- glmer(SCMU_hourly_det ~ image_type + tod + jday + jday^2 + (1 | cam_id), 
+            data = camera_hourly, family = binomial)
 summary(m1)
+
+## day of year as a quadratic
+# plot(camera_hourly$jday, camera_hourly$jday) 
+# plot(camera_hourly$jday, camera_hourly$jday + camera_hourly$jday^2)
+# plot(camera_hourly$jday, (-0.14*camera_hourly$jday +  ((-0.14^2)*camera_hourly$jday^2)))
 ```
 
 ## Model #2: CORA Camera Detections
+```{r mod2}
+m2 <- glmer(CORA_hourly_det ~ image_type + tod + jday + jday^2 + (1 | cam_id), 
+            data = camera_hourly, family = binomial)
+summary(m2)
+
+```
