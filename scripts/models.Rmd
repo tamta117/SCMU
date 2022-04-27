@@ -8,6 +8,9 @@ output: pdf_document
 # TODO
 # add site effect?
 # add distance from acoustic unit to camera for acoustic models? 
+# figure out camera ID for acoustic detections
+# add categorical column: before = time.since2 is pos or after = time.sinc2 is neg
+# think camera before acoustic
 
 
 ```{r setup, include=FALSE}

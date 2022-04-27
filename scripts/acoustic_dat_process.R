@@ -55,45 +55,48 @@ library(stringi)
 
 #### Make acoustic csv ####
 ### NEED TO TWEAK CODE
-camera_org<-read.csv("data/camera/camera_dat.csv")
+camera_org<-read.csv("data/camera/camera_dat_full.csv")
 # camera_acoustic = subset(camera_org, select=c(-ImageQuality, -DeleteFlag, -CameraLocation,
 #                                               -StartDate, -TechnicianName, -Service, -Empty, 
 #                                               -Human, -HumanActivity, -Tags, -GoodPicture,
 #                                               -Folder))
 camera_acoustic <- camera_org
-camera_acoustic <- subset(camera_acoustic, Animal=="true")
-camera_lava1=subset(camera_acoustic, Site=="Lava1")
-camera_lava2=subset(camera_acoustic, Site=="Lava2")
-camera_moss=subset(camera_acoustic, Site=="Moss")
-camera_pinnacle=subset(camera_acoustic, Site=="Pinnacle")
-camera_refuge=subset(camera_acoustic, Site=="Refuge")
+camera_acoustic <- subset(camera_acoustic, animal=="true")
+camera_lava1=subset(camera_acoustic, site=="Lava1")
+camera_lava2=subset(camera_acoustic, site=="Lava2")
+camera_moss=subset(camera_acoustic, site=="Moss")
+camera_pinnacle=subset(camera_acoustic, site=="Pinnacle")
+camera_refuge=subset(camera_acoustic, site=="Refuge")
 
-write.csv(camera_lava1,"odata\\lava1_acoustic.csv", row.names=FALSE)
-write.csv(camera_lava2,"odata\\lava2_acoustic.csv", row.names=FALSE)
-write.csv(camera_moss,"odata\\moss_acoustic.csv", row.names=FALSE)
-write.csv(camera_pinnacle,"odata\\pinnacle_acoustic.csv", row.names=FALSE)
-write.csv(camera_refuge,"odata\\refuge_acoustic.csv", row.names=FALSE)
+write.csv(camera_lava1,"data/camera/lava1_cam.csv", row.names=FALSE)
+write.csv(camera_lava2,"data/camera/lava2_cam.csv", row.names=FALSE)
+write.csv(camera_moss,"data/camera/moss_cam.csv", row.names=FALSE)
+write.csv(camera_pinnacle,"data/camera/pinnacle_cam.csv", row.names=FALSE)
+write.csv(camera_refuge,"data/camera/refuge_cam.csv", row.names=FALSE)
 
 #### Find all processed acoustic files ####
 #Read in cam csv with all detections from camera data by site 
-lava1_cam<-read.csv(here("data/camera/archive/lava1_cam.csv"))
-lava2_cam<-read.csv(here("data/camera/archive/lava2_cam.csv"))
-moss_cam<-read.csv(here("data/camera/archive/moss_cam.csv"))
-pinnacle_cam<-read.csv(here("data/camera/archive/pinnacle_cam.csv"))%>%
-  mutate(Murrelet=ifelse(Murrelet=="true",TRUE,FALSE))
-refuge_cam<-read.csv(here("data/camera/archive/refuge_cam.csv"))%>%
-  mutate(Murrelet=ifelse(Murrelet=="true",TRUE,FALSE))
+lava1_cam<-read.csv(here("data/camera/lava1_cam.csv"))%>%
+  mutate(murrelet=ifelse(murrelet=="true",TRUE,FALSE))
+lava2_cam<-read.csv(here("data/camera/lava2_cam.csv"))%>%
+  mutate(murrelet=ifelse(murrelet=="true",TRUE,FALSE))
+moss_cam<-read.csv(here("data/camera/moss_cam.csv"))%>%
+  mutate(murrelet=ifelse(murrelet=="true",TRUE,FALSE))
+pinnacle_cam<-read.csv(here("data/camera/pinnacle_cam.csv"))%>%
+  mutate(murrelet=ifelse(murrelet=="true",TRUE,FALSE))
+refuge_cam<-read.csv(here("data/camera/refuge_cam.csv"))%>%
+  mutate(murrelet=ifelse(murrelet=="true",TRUE,FALSE))
 
 #join all cam files
 all_cam<-rbindlist(list(lava1_cam, lava2_cam, moss_cam,
                         pinnacle_cam, refuge_cam))%>%
-  unite("date_time",Date:Time,remove=FALSE, sep=" ")
+  unite("date_time",date:time,remove=FALSE, sep=" ")
 
 #change time into desirable format
 all_cam$date_time<-parse_date_time(all_cam$date_time, 
-                                   c( "ymd HMS","mdy HMS"), tz="")
+                                   c( "ymd HMS","mdy HMS"), tz="UTC")
 ravmurr_cam<-all_cam%>%
-  subset(Species=="Raven" | Murrelet=="TRUE")%>%
+  subset(species=="raven" | murrelet==TRUE)%>%
   mutate(yr=year(date_time),
          mnth=month(date_time),
          d=day(date_time),
@@ -115,16 +118,26 @@ time_cam$sec1<-sapply(time_cam$sec1,as.integer)
 # +- 10 minutes
 time.p<-time_cam%>%
   mutate(datetime=ymd_hms(paste(yr,mnth,d,hr,min1,sec1)),
-         datetime.r=datetime+600)
+         datetime.r=datetime+600,
+         time.since=difftime(date_time,datetime.r, units = c("secs")),
+         time.since2=as.numeric(time.since, units="secs"),
+         beaf="before")
 time.m<-time_cam%>%
   mutate(datetime=ymd_hms(paste(yr,mnth,d,hr,min1,sec1)),
-         datetime.r=datetime-600)
+         datetime.r=datetime-600,
+         time.since=difftime(date_time,datetime.r, units = c("secs")),
+         time.since2=as.numeric(time.since, units="secs"),
+         beaf="after")
 time<-time_cam%>%
-  mutate(datetime.r=ymd_hms(paste(yr,mnth,d,hr,min1,sec1)))
+  mutate(datetime.r=ymd_hms(paste(yr,mnth,d,hr,min1,sec1)),
+         time.since=difftime(date_time,datetime.r, units = c("secs")),
+         time.since2=as.numeric(time.since, units="secs"),
+         beaf=ifelse(time.since2!=0,"before","now"))
 
 # combine all time
 time.all<-bind_rows(time.p,time.m,time)
-time.all<-distinct(time.all,datetime.r,.keep_all = TRUE)
+time.all<-distinct(time.all,datetime.r,.keep_all = TRUE)%>%
+  select(date_time,datetime.r,site,cam_id,time.since2,beaf)
 
 # make it look like wav file format
 time.all$datetime.r<-gsub(" ", "_",
@@ -136,38 +149,30 @@ time.all$datetime.r<-gsub("-", "",
 time.all$datetime.r <- paste0(time.all$datetime.r, ".wav")
 
 lava1.time<-time.all%>%
-  subset(Site=="Lava1" & date_time<"2021-05-23")%>%
-  select(datetime.r,Site)
+  subset(site=="Lava1" & date_time<"2021-05-23")
 lava1.time$datetime.r <- sub("^", "S4A04765_", lava1.time$datetime.r)
-colnames(lava1.time)<-c("Begin File","site")
 
 lava2.time<-time.all%>%
-  subset(Site=="Lava2" & date_time<"2021-05-22")%>%
-  select(datetime.r,Site)
+  subset(site=="Lava2" & date_time<"2021-05-22")
 lava2.time$datetime.r <- sub("^", "PWR01_", lava2.time$datetime.r)
-colnames(lava2.time)<-c("Begin File","site")
 
 moss.time<-time.all%>%
-  subset(Site=="Moss")%>%
-  select(datetime.r,Site)
+  subset(site=="Moss")
 moss.time$datetime.r <- sub("^", "PWR04_", moss.time$datetime.r)
-colnames(moss.time)<-c("Begin File","site")
 
 pinn.time<-time.all%>%
-  subset(Site=="Pinnacle")%>%
-  select(datetime.r,Site)
+  subset(site=="Pinnacle")
 pinn.time$datetime.r <- sub("^", "PWR05_", pinn.time$datetime.r)
-colnames(pinn.time)<-c("Begin File","site")
 
 ref.time<-time.all%>%
-  subset(Site=="Refuge")%>%
-  select(datetime.r,Site)
+  subset(site=="Refuge")
 ref.time$datetime.r <- sub("^", "S4A07766_", ref.time$datetime.r)
-colnames(ref.time)<-c("Begin File","site")
 
 # combine all tables
 time.fin<-bind_rows(lava1.time,lava2.time,moss.time,pinn.time,
-                    ref.time)
+                    ref.time)%>%
+  mutate(`Begin File`=datetime.r)%>%
+  select(-date_time,-datetime.r)
 
 ####anti_join and combine all acoustic data####
 ## read in data
@@ -189,15 +194,18 @@ all.acoustic<-bind_rows(lava1_dir,lava2_dir,moss_dir,pinn_dir,
                         ref_dir)
 all.acoustic<-distinct(all.acoustic,`Begin File`,.keep_all=TRUE)
 
+#join to get cam_id and filter out NAs
+all.join<-left_join(all.acoustic,time.fin,by=c("Begin File","site"))%>%
+  filter(!is.na(cam_id))
+
 #anti join
-all.non.det<-anti_join(time.fin,all.acoustic,by="Begin File")
+all.non.det<-anti_join(time.fin,all.join,by="Begin File")
 
 #combine all processed acoustic tables
-acoustic_dir<-rbindlist(list(all.acoustic,all.non.det),fill=TRUE)
+acoustic_dir<-rbindlist(list(all.join,all.non.det),fill=TRUE)
 
 #emulate camera_dat table
 acoustic_cam<-acoustic_dir%>%
-  select(`Begin File`, Species, site)%>%
   distinct(`Begin File`,.keep_all=TRUE)%>%
   separate(`Begin File`,
            into=c("ex1","yr","mnth","d","ex2","hr","min","sec","ex3"),
@@ -205,17 +213,18 @@ acoustic_cam<-acoustic_dir%>%
   select(-ex1,-ex2,-ex3)%>%
   unite(c(hr,min,sec),col=time,sep=":",remove=FALSE)%>%
   mutate(date=ymd(paste(yr,mnth,d)),
-         date_time=ymd_hms(paste(date,time)),
+         date_time=ymd_hms(paste(date,time),tz="UTC"),
          jday = yday(date_time),
          SCMU=case_when(Species=="M"~1,TRUE~0),
          CORA=case_when(Species=="R"~1,TRUE~0))%>%
-  select(`Begin File`,site,date,time,date_time,yr,mnth,d,jday,
-         hr,min,sec,SCMU,CORA)
+  select(`Begin File`,site,cam_id,date,time,date_time,yr,mnth,d,jday,
+         hr,min,sec,time.since2,beaf,SCMU,CORA)
 
-write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.csv"))
+#write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.csv"))
+write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.0427.csv"))
 
 #### bin time into dusk and day ####
-acoustic_cam<-read.csv(here("data/acoustic/acoustic_cam.csv"))
+acoustic_cam<-read.csv(here("data/acoustic/acoustic_cam.0427.csv"))
 acoustic_cam$hr<-as.numeric(acoustic_cam$hr)
 acoustic_cam1<-acoustic_cam%>%
   subset(acoustic_cam$date<="2021-03-15")%>%
