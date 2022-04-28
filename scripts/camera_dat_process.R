@@ -16,7 +16,7 @@ lava1 <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  #dplyr::select(-c("...27")) %>%
+  dplyr::select(-c("...27")) %>%
   mutate(Site = "Lava1",
          cam_id = c("cam_01")) %>%
   dplyr::select(Site, everything())
@@ -26,7 +26,7 @@ lava2 <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  #dplyr::select(-c("...27")) %>%
+  dplyr::select(-c("...27")) %>%
   mutate(Site = "Lava2",
          cam_id = c("cam_02")) %>%
   dplyr::select(Site, everything())
@@ -36,7 +36,7 @@ moss <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  #dplyr::select(-c("...27")) %>%
+  dplyr::select(-c("...27")) %>%
   mutate(Site = "Moss",
          cam_id = ifelse(Folder == "Moss Camera 1", "cam_03", "cam_04")) %>%
   dplyr::select(Site, everything())
@@ -46,7 +46,7 @@ pinnacle <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  #dplyr::select(-c("...27")) %>%
+  dplyr::select(-c("...27")) %>%
   mutate(Site = "Pinnacle",
          cam_id = ifelse(Folder == "Pinnacle Camera 1", "cam_05", "cam_06")) %>%
   dplyr::select(Site, everything())
@@ -56,7 +56,7 @@ refuge <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  #dplyr::select(-c("...27")) %>%
+  dplyr::select(-c("...27")) %>%
   mutate(Site = "Refuge",
          cam_id = c("cam_07")) %>%
   dplyr::select(Site, everything())
@@ -109,11 +109,42 @@ camera_dat_full <- camera_raw_dat %>%
   dplyr::select(folder, relative_path, file, image_no, site, cam_id, date_time, date, time,
                 year, month, day, jday, hour, min, sec, image_type, everything())
 
-# write.csv(camera_dat_full, here("data", "camera", "camera_dat_full.csv"), row.names = FALSE)
+camera_dat_full$hour<-as.numeric(camera_dat_full$hour)
+dat1<-camera_dat_full%>%
+  subset(camera_dat_full$date<="2021-03-15")%>%
+  mutate(tod=case_when(
+    hour<=6~"dawn",
+    hour>=7 & hour<=16 ~ "day",
+    hour>=17~"dusk"))
+dat2<-camera_dat_full%>%
+  subset(camera_dat_full$date>="2021-03-16" & 
+           camera_dat_full$date<="2021-05-01")%>%
+  mutate(tod=case_when(
+    hour<=5~"dawn",
+    hour>=6 & hour<=17 ~ "day",
+    hour>=18~"dusk"))
+dat3<-camera_dat_full%>%
+  subset(camera_dat_full$date>="2021-05-02" & 
+           camera_dat_full$date<="2021-05-30")%>%
+  mutate(tod=case_when(
+    hour<=4~"dawn",
+    hour>=5 & hour<=17 ~ "day",
+    hour>=18~"dusk"))
+dat4<-camera_dat_full%>%
+  subset(camera_dat_full$date>="2021-05-31")%>%
+  mutate(tod=case_when(
+    hour<=4~"dawn",
+    hour>=5 & hour<=18 ~ "day",
+    hour>=19~"dusk"))
+dat5<-bind_rows(dat1, dat2, dat3, dat4) %>%
+  dplyr::select(folder, relative_path, file, image_no, site, cam_id, date_time, date, time,
+                year, month, day, jday, hour, min, sec, tod, everything())
+
+# write.csv(dat5, here("data", "camera", "camera_dat_full.csv"), row.names = FALSE)
 
 ## create dataframe for SCMU and CORA with all images 
-camera_dat_all_images <- camera_dat_full %>%
-  dplyr::select(image_no, site, cam_id, date, time, date_time, year, month, day, jday, hour, min, sec, image_type, detection,
+camera_dat_all_images <- dat5 %>%
+  dplyr::select(image_no, site, cam_id, date, time, date_time, year, month, day, jday, hour, min, sec, tod, image_type, detection,
                 SCMU, CORA)
 
 # write.csv(camera_dat_all_images, here("data", "camera_dat_all_images.csv"), row.names = FALSE)
@@ -159,45 +190,13 @@ camera_dat_image_set <- camera_dat_all_images %>%
 
 ## create hourly detection data
 hourly_det <- camera_dat_image_set %>%
-  dplyr::select(site, cam_id, date, jday, hour, image_type, SCMU, CORA) %>%
+  dplyr::select(site, cam_id, date, jday, hour, tod, image_type, SCMU, CORA) %>%
   group_by(site, cam_id, date, hour, image_type) %>%
   mutate(SCMU_hourly_det = ifelse(any(SCMU == 1), 1, 0),
          CORA_hourly_det = ifelse(any(CORA == 1), 1, 0)) %>%
-  group_by(site, cam_id, date, hour, image_type) %>%
+  group_by(site, cam_id, date, hour, tod, image_type) %>%
   slice(1L) %>%
-  dplyr::select(site, cam_id, date, jday, hour, image_type, SCMU_hourly_det, CORA_hourly_det)
-
-hourly_det$hour<-as.numeric(hourly_det$hour)
-hourly_det1<-hourly_det%>%
-  #mutate(date = as_datetime(
-    #date, format = "%Y-%m-%d"))%>%
-  subset(hourly_det$date<="2021-03-15")%>%
-  mutate(tod=case_when(
-    hour<=6~"dawn",
-    hour>=7 & hour<=16 ~ "day",
-    hour>=17~"dusk"))
-hourly_det2<-hourly_det%>%
-  subset(hourly_det$date>="2021-03-16" & 
-           hourly_det$date<="2021-05-01")%>%
-  mutate(tod=case_when(
-    hour<=5~"dawn",
-    hour>=6 & hour<=17 ~ "day",
-    hour>=18~"dusk"))
-hourly_det3<-hourly_det%>%
-  subset(hourly_det$date>="2021-05-02" & 
-           hourly_det$date<="2021-05-30")%>%
-  mutate(tod=case_when(
-    hour<=4~"dawn",
-    hour>=5 & hour<=17 ~ "day",
-    hour>=18~"dusk"))
-hourly_det4<-hourly_det%>%
-  subset(hourly_det$date>="2021-05-31")%>%
-  mutate(tod=case_when(
-    hour<=4~"dawn",
-    hour>=5 & hour<=18 ~ "day",
-    hour>=19~"dusk"))
-hourly_det5<-bind_rows(hourly_det1,hourly_det2,
-                         hourly_det3,hourly_det4)
+  dplyr::select(site, cam_id, date, jday, hour, tod, image_type, SCMU_hourly_det, CORA_hourly_det)
 
 ## export csv
-write.csv(hourly_det5, here("data", "camera_hourly_det.csv"), row.names = FALSE)
+# write.csv(hourly_det, here("data", "camera_hourly_det.csv"), row.names = FALSE)
