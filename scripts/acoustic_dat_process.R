@@ -182,7 +182,7 @@ time.fin<-bind_rows(lava1.time,lava2.time,moss.time,pinn.time,
                     ref.time)%>%
   mutate(`Begin File`=datetime.r)%>%
   select(-date_time,-datetime.r)
-time.fin<-distinct(time.fin, `Begin File`,.keep_all = TRUE)
+time.fin<-distinct(time.fin,`Begin File`,.keep_all = TRUE)
 
 ####anti_join and combine all acoustic data####
 ## read in data
