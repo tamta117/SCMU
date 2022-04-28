@@ -89,7 +89,8 @@ summary(m4)
 Binomial generalized linear mixed model to understand effect of time since camera detection, before/after/during camera detection, time of day (dawn, day, dusk), time of year (julian day, quadratic effect), distance from acoustic unit to camera (?) plus random effect of camera id (n = 7) on ability to detect murrelets on acoustic units given known camera detection.
 
 ```{r m5}
-m5 <- glmer(SCMU ~ time_since + time_interval + tod + jday + jday^2 + distance + (1 | cam_id), 
+m5 <- glmer(SCMU ~ time_since + time_int + tod + jday + jday^2 + #distance + 
+              (1 | cam_id), 
             data = acoustic, family = binomial)
 summary(m5)
 
@@ -98,7 +99,10 @@ summary(m5)
 ## Model #6: CORA Acoustic Detections
 Binomial generalized linear mixed model to understand effect of time since camera detection, before/after/during camera detection, time of day (dawn, day, dusk), time of year (julian day, quadratic effect), distance from acoustic unit to camera (?) plus random effect of camera id (n = 7) on ability to detect ravens on acoustic units given known camera detection.
 ```{r m6}
-m6 <- glmer(CORA ~ time_since + time_interval + tod + jday + jday^2 + distance + (1 | cam_id), 
-            data = acoustic, family = binomial)
-summary(m6)
+cora <- acoustic %>% filter(CORA == 1) # there are only 3 CORA acoustic detections!
+
+m6 <- glmer(CORA ~ time_since + time_int + tod + jday + jday^2 + #distance +
+               (1 | cam_id),
+             data = acoustic, family = binomial)
+ summary(m6)
 ```

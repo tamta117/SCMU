@@ -119,27 +119,34 @@ time_cam$sec1<-sapply(time_cam$sec1,as.integer)
 time.p<-time_cam%>%
   mutate(datetime=ymd_hms(paste(yr,mnth,d,hr,min1,sec1)),
          datetime.r=datetime+600,
-         time.since=difftime(date_time,datetime.r, units = c("secs")),
-         time.since2=as.numeric(time.since, units="secs"),
-         beaf="before")
+         time_since=as.numeric(difftime(date_time,datetime.r, units = c("mins"))),
+         #time.since2=as.numeric(time.since, units="secs"),
+         time_int="before")
 time.m<-time_cam%>%
   mutate(datetime=ymd_hms(paste(yr,mnth,d,hr,min1,sec1)),
          datetime.r=datetime-600,
-         time.since=difftime(date_time,datetime.r, units = c("secs")),
-         time.since2=as.numeric(time.since, units="secs"),
-         beaf="after")
+         time_since=as.numeric(difftime(date_time,datetime.r, units = c("mins"))),
+         #time.since2=as.numeric(time.since, units="secs"),
+         time_int="after")
 time<-time_cam%>%
   mutate(datetime.r=ymd_hms(paste(yr,mnth,d,hr,min1,sec1)),
-         time.since=difftime(date_time,datetime.r, units = c("secs")),
-         time.since2=as.numeric(time.since, units="secs"),
-         beaf=ifelse(time.since2!=0,"before","now"))
+         time_since=as.numeric(difftime(date_time,datetime.r, units = c("mins"))),
+         #time.since2=as.numeric(time.since, units="secs"),
+         time_int=ifelse(time_since!=0,"before","during"))
 
 # combine all time
+<<<<<<< HEAD
 time.all<-rbindlist(list(time.p,time.m,time),fill=TRUE)
 # time.all<-distinct(time.all,datetime.r,.keep_all = TRUE)%>%
 #   select(date_time,datetime.r,site,cam_id,time.since2,beaf)
 time.all<-time.all%>%
   select(date_time,datetime.r,site,cam_id,time.since2,beaf)
+=======
+time.all<-bind_rows(time.p,time.m,time) %>%
+  mutate(time_since = abs(time_since)) # take absolute value
+time.all<-distinct(time.all,datetime.r,.keep_all = TRUE)%>%
+  select(date_time, datetime.r, site, cam_id, time_since, time_int)
+>>>>>>> f958a8986e7b2dd74071160c8686589bbe084840
 
 # make it look like wav file format
 time.all$datetime.r<-gsub(" ", "_",
@@ -221,7 +228,7 @@ acoustic_cam<-acoustic_dir%>%
          SCMU=case_when(Species=="M"~1,TRUE~0),
          CORA=case_when(Species=="R"~1,TRUE~0))%>%
   select(`Begin File`,site,cam_id,date,time,date_time,yr,mnth,d,jday,
-         hr,min,sec,time.since2,beaf,SCMU,CORA)
+         hr,min,sec,time_since,time_int,SCMU,CORA)
 
 #write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.csv"))
 write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.0427.csv"))
