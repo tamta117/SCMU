@@ -96,7 +96,7 @@ all_cam<-rbindlist(list(lava1_cam, lava2_cam, moss_cam,
 all_cam$date_time<-parse_date_time(all_cam$date_time, 
                                    c( "ymd HMS","mdy HMS"), tz="UTC")
 ravmurr_cam<-all_cam%>%
-  subset(species=="raven" | murrelet==TRUE)%>%
+  filter(species=="Raven" | murrelet==TRUE)%>%
   mutate(yr=year(date_time),
          mnth=month(date_time),
          d=day(date_time),
@@ -135,8 +135,10 @@ time<-time_cam%>%
          beaf=ifelse(time.since2!=0,"before","now"))
 
 # combine all time
-time.all<-bind_rows(time.p,time.m,time)
-time.all<-distinct(time.all,datetime.r,.keep_all = TRUE)%>%
+time.all<-rbindlist(list(time.p,time.m,time),fill=TRUE)
+# time.all<-distinct(time.all,datetime.r,.keep_all = TRUE)%>%
+#   select(date_time,datetime.r,site,cam_id,time.since2,beaf)
+time.all<-time.all%>%
   select(date_time,datetime.r,site,cam_id,time.since2,beaf)
 
 # make it look like wav file format
@@ -173,6 +175,7 @@ time.fin<-bind_rows(lava1.time,lava2.time,moss.time,pinn.time,
                     ref.time)%>%
   mutate(`Begin File`=datetime.r)%>%
   select(-date_time,-datetime.r)
+time.fin<-distinct(time.fin,`Begin File`,.keep_all = TRUE)
 
 ####anti_join and combine all acoustic data####
 ## read in data
