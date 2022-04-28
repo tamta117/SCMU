@@ -135,18 +135,9 @@ time<-time_cam%>%
          time_int=ifelse(time_since!=0,"before","during"))
 
 # combine all time
-<<<<<<< HEAD
-time.all<-rbindlist(list(time.p,time.m,time),fill=TRUE)
-# time.all<-distinct(time.all,datetime.r,.keep_all = TRUE)%>%
-#   select(date_time,datetime.r,site,cam_id,time.since2,beaf)
-time.all<-time.all%>%
-  select(date_time,datetime.r,site,cam_id,time.since2,beaf)
-=======
-time.all<-bind_rows(time.p,time.m,time) %>%
-  mutate(time_since = abs(time_since)) # take absolute value
-time.all<-distinct(time.all,datetime.r,.keep_all = TRUE)%>%
-  select(date_time, datetime.r, site, cam_id, time_since, time_int)
->>>>>>> f958a8986e7b2dd74071160c8686589bbe084840
+time.all<-rbindlist(list(time.p,time.m,time),fill=TRUE)%>%
+  mutate(time_since = abs(time_since))%>% # take absolute value
+  select(date_time,datetime.r,site,cam_id,time_since,time_int)
 
 # make it look like wav file format
 time.all$datetime.r<-gsub(" ", "_",
