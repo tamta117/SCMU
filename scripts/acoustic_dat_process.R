@@ -90,7 +90,8 @@ refuge_cam<-read.csv(here("data/camera/refuge_cam.csv"))%>%
 #join all cam files
 all_cam<-rbindlist(list(lava1_cam, lava2_cam, moss_cam,
                         pinnacle_cam, refuge_cam))%>%
-  unite("date_time",date:time,remove=FALSE, sep=" ")
+  unite("date_time",date:time,remove=FALSE, sep=" ")%>%
+  filter(image_type=="timelapse")
 
 #change time into desirable format
 all_cam$date_time<-parse_date_time(all_cam$date_time, 
@@ -222,10 +223,11 @@ acoustic_cam<-acoustic_dir%>%
          hr,min,sec,time_since,time_int,SCMU,CORA)
 
 #write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.csv"))
-write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.0427.csv"))
+#write_csv(acoustic_cam,here("data/acoustic/acoustic_cam.0427.csv"))
+write_csv(acoustic_cam,here("data/acoustic/acoustic_mod.csv"))
 
 #### bin time into dusk and day ####
-acoustic_cam<-read.csv(here("data/acoustic/acoustic_cam.0427.csv"))
+acoustic_cam<-read.csv(here("data/acoustic/acoustic_mod.csv"))
 acoustic_cam$hr<-as.numeric(acoustic_cam$hr)
 acoustic_cam1<-acoustic_cam%>%
   subset(acoustic_cam$date<="2021-03-15")%>%

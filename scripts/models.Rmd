@@ -25,9 +25,7 @@ library(here)
 library(lme4)
 
 ## load data
-camera_full <- read.csv(here("data", "camera_dat_all_images.csv")) 
-camera_set <- read.csv(here("data", "camera_dat_image_set.csv")) 
-camera_hourly <- read.csv(here("data", "camera_hourly_det.csv"))
+camera_hourly <- read.csv(here("data", "camera_mod.csv"))
 acoustic <- read.csv(here("data", "acoustic", "acoustic_cam_tod.csv")) 
 ```
 # Camera Trap Data 
@@ -44,7 +42,7 @@ Binomial generalized linear mixed model to understand effect of image type (moti
 #image_type + image_type : photo_count
 #image_type + image_type : I(log(photo_count)) 
 
-m1 <- glmer(SCMU_hourly_det ~ image_type  + tod + jday + jday^2 + # + photo count (nest)
+m1 <- glmer(SCMU_hourly_det ~ image_type + image_type:photo_count + tod + jday + jday^2 + 
               (1 | cam_id), 
             data = camera_hourly, family = binomial)
 summary(m1)
@@ -58,37 +56,37 @@ summary(m1)
 ## Model #2: CORA Camera Detections
 Binomial generalized linear mixed model to understand effect of image type (motion-capture versus timelapse), time of day (dawn, day, dusk) and time of year (julian day, quadratic effect) plus random effect of camera id (n = 7) on ability to detect ravens within one-hour time periods. 
 ```{r mod2}
-m2 <- glmer(CORA_hourly_det ~ image_type + tod + jday + jday^2 + (1 | cam_id), 
+m2 <- glmer(CORA_hourly_det ~ image_type + image_type:photo_count + tod + jday + jday^2 + (1 | cam_id), 
             data = camera_hourly, family = binomial)
 summary(m2)
 
 ```
 
-## Model #3: Total images
-Poisson (or negative binomial?) generalized linear mixed model to understand effect of image type (motion-capture versus timelapse), time of day (dawn, day, dusk) and time of year (julian day, quadratic effect) plus random effect of camera id (n = 7) on ability to detect murrelets using all images. 
+<!-- ## Model #3: Total images -->
+<!-- Poisson (or negative binomial?) generalized linear mixed model to understand effect of image type (motion-capture versus timelapse), time of day (dawn, day, dusk) and time of year (julian day, quadratic effect) plus random effect of camera id (n = 7) on ability to detect murrelets using all images.  -->
 
-Plot the data, suspect will be highly overdispersed, thus negative binomial): glmmb (mixed effect package that handles negative binomial)
+<!-- Plot the data, suspect will be highly overdispersed, thus negative binomial): glmmb (mixed effect package that handles negative binomial) -->
 
-Repeat for ravens? Need to group detections somehow?
-```{r m3}
-# plot(camera_full$SCMU)
+<!-- Repeat for ravens? Need to group detections somehow? -->
+<!-- ```{r m3} -->
+<!-- # plot(camera_full$SCMU) -->
 
-m3 <- glmer(SCMU ~ image_type + tod + jday + jday^2 + (1 | cam_id), 
-            data = camera_full, family = binomial)
-summary(m3)
-
-
-```
+<!-- m3 <- glmer(SCMU ~ image_type + tod + jday + jday^2 + (1 | cam_id),  -->
+<!--             data = camera_full, family = binomial) -->
+<!-- summary(m3) -->
 
 
-## Model #4: Image sets
-Poisson generalized linear mixed model to understand effect of image type (motion-capture versus timelapse), time of day (dawn, day, dusk) and time of year (julian day, quadratic effect) plus random effect of camera id (n = 7) on ability to detect murrelets using image sets within 10-minute detection windows. 
+<!-- ``` -->
 
-```{r m4}
-m4 <- glmer(SCMU ~ image_type + tod + jday + jday^2 + (1 | cam_id), 
-            data = camera_set, family = binomial)
-summary(m4)
-```
+
+<!-- ## Model #4: Image sets -->
+<!-- Poisson generalized linear mixed model to understand effect of image type (motion-capture versus timelapse), time of day (dawn, day, dusk) and time of year (julian day, quadratic effect) plus random effect of camera id (n = 7) on ability to detect murrelets using image sets within 10-minute detection windows.  -->
+
+<!-- ```{r m4} -->
+<!-- m4 <- glmer(SCMU ~ image_type + tod + jday + jday^2 + (1 | cam_id),  -->
+<!--             data = camera_set, family = binomial) -->
+<!-- summary(m4) -->
+<!-- ``` -->
 
 # Acoustic Data
 
@@ -96,7 +94,9 @@ summary(m4)
 Binomial generalized linear mixed model to understand effect of time since camera detection, before/after/during camera detection, time of day (dawn, day, dusk), time of year (julian day, quadratic effect), distance from acoustic unit to camera (?) plus random effect of camera id (n = 7) on ability to detect murrelets on acoustic units given known camera detection.
 
 ```{r m5}
-m5 <- glmer(SCMU ~ time_since + time_int + tod + jday + jday^2 + #distance + 
+acoustic <- acoustic %>% mutate(time_int = ifelse(time_int == "during", "aduring", time_int))
+
+m5 <- glmer(SCMU ~ time_int + tod + jday + jday^2 + #distance + 
               (1 | cam_id), 
             data = acoustic, family = binomial)
 summary(m5)
@@ -108,7 +108,7 @@ Binomial generalized linear mixed model to understand effect of time since camer
 ```{r m6}
 cora <- acoustic %>% filter(CORA == 1) # there are only 26 CORA acoustic detections!
 
-m6 <- glmer(CORA ~ time_since + time_int + tod + jday + jday^2 + #distance +
+m6 <- glmer(CORA ~ time_int + tod + jday + jday^2 + #distance +
                (1 | cam_id),
              data = acoustic, family = binomial)
  summary(m6)
