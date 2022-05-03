@@ -16,7 +16,7 @@ lava1 <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  dplyr::select(-c("...27")) %>%
+  #dplyr::select(-c("...27")) %>%
   mutate(Site = "Lava1",
          cam_id = c("cam_01")) %>%
   dplyr::select(Site, everything())
@@ -26,7 +26,7 @@ lava2 <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  dplyr::select(-c("...27")) %>%
+  #dplyr::select(-c("...27")) %>%
   mutate(Site = "Lava2",
          cam_id = c("cam_02")) %>%
   dplyr::select(Site, everything())
@@ -36,7 +36,7 @@ moss <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  dplyr::select(-c("...27")) %>%
+  #dplyr::select(-c("...27")) %>%
   mutate(Site = "Moss",
          cam_id = ifelse(Folder == "Moss Camera 1", "cam_03", "cam_04")) %>%
   dplyr::select(Site, everything())
@@ -46,7 +46,7 @@ pinnacle <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  dplyr::select(-c("...27")) %>%
+  #dplyr::select(-c("...27")) %>%
   mutate(Site = "Pinnacle",
          cam_id = ifelse(Folder == "Pinnacle Camera 1", "cam_05", "cam_06")) %>%
   dplyr::select(Site, everything())
@@ -56,7 +56,7 @@ refuge <-
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
-  dplyr::select(-c("...27")) %>%
+  #dplyr::select(-c("...27")) %>%
   mutate(Site = "Refuge",
          cam_id = c("cam_07")) %>%
   dplyr::select(Site, everything())
@@ -147,56 +147,73 @@ camera_dat_all_images <- dat5 %>%
   dplyr::select(image_no, site, cam_id, date, time, date_time, year, month, day, jday, hour, min, sec, tod, image_type, detection,
                 SCMU, CORA)
 
-# write.csv(camera_dat_all_images, here("data", "camera_dat_all_images.csv"), row.names = FALSE)
-
-## extract independent detections (set at 10 minutes, code from Sarah B. Bassing) for image set
-dat <- camera_dat_all_images %>%
-  dplyr::select(image_no, site, date_time, image_type, SCMU, CORA) %>%
-  pivot_longer(cols = c(SCMU, CORA), names_to = "species", values_to = "detection") %>%
-  filter(detection == 1) %>%
-  arrange(site, date_time)
-caps <- c()
-caps[1] <- 1
-for (i in 2:nrow(dat)){
-  if (dat$site[i-1] != dat$site[i]) caps[i] = i
-  if (dat$image_type[i-1] != dat$image_type[i]) caps[i] = i
-  else (if (dat$species[i-1] != dat$species[i]) caps[i] = i
-        else (if (difftime(dat$date_time[i], dat$date_time[i-1], units = c("mins")) >= 10) caps[i] = i
-              else caps[i] = caps[i-1]))
-}
-
-caps <- as.factor(caps)
-
-#'  Add new column to larger data set
-capdata <- cbind(as.data.frame(dat), caps)
-
-#'  Retain only the first image from each unique detection event
-detect <- capdata %>%
-  group_by(caps) %>%
-  slice(1L) %>%
-  ungroup() %>%
-  dplyr::select(-c(caps)) %>%
-  group_by(image_no, site, date_time) %>%
-  pivot_wider(names_from = species, values_from = detection)
-
-## create new dataframe with detection info
-camera_dat_image_set <- camera_dat_all_images %>%
-  dplyr::select(-c(detection, SCMU, CORA)) %>%
-  full_join(detect, by = c("image_no", "site", "date_time", "image_type")) %>%
-  replace(is.na(.), 0) # replace NA values with 0
-
-## export csv
-# write.csv(camera_dat_image_set, here("data", "camera_dat_image_set.csv"), row.names = FALSE)
-
-## create hourly detection data
-hourly_det <- camera_dat_image_set %>%
+## create dataframe for analysis
+cam_mod<-camera_dat_all_images%>%
   dplyr::select(site, cam_id, date, jday, hour, tod, image_type, SCMU, CORA) %>%
   group_by(site, cam_id, date, hour, image_type) %>%
   mutate(SCMU_hourly_det = ifelse(any(SCMU == 1), 1, 0),
          CORA_hourly_det = ifelse(any(CORA == 1), 1, 0)) %>%
-  group_by(site, cam_id, date, hour, tod, image_type) %>%
-  slice(1L) %>%
-  dplyr::select(site, cam_id, date, jday, hour, tod, image_type, SCMU_hourly_det, CORA_hourly_det)
+  group_by(site, cam_id, date, hour, tod, image_type, 
+           SCMU_hourly_det, CORA_hourly_det, jday) %>%
+  summarize(photo_count = n())%>%
+  ungroup() %>%
+  dplyr::select(site, cam_id, date, jday, hour, tod, 
+                image_type, photo_count, SCMU_hourly_det, 
+                CORA_hourly_det)%>%
+  complete(site, cam_id, date, jday, hour, tod, image_type, 
+           fill = list(photo_count = 0, SCMU_hourly_det = 0, CORA_hourly_det =0))
 
-## export csv
-# write.csv(hourly_det, here("data", "camera_hourly_det.csv"), row.names = FALSE)
+
+# write.csv(camera_dat_all_images, here("data", "camera_dat_all_images.csv"), row.names = FALSE)
+#' 
+#' ## extract independent detections (set at 10 minutes, code from Sarah B. Bassing) for image set
+#' dat <- camera_dat_all_images %>%
+#'   dplyr::select(image_no, site, date_time, image_type, SCMU, CORA) %>%
+#'   pivot_longer(cols = c(SCMU, CORA), names_to = "species", values_to = "detection") %>%
+#'   filter(detection == 1) %>%
+#'   arrange(site, date_time)
+#' caps <- c()
+#' caps[1] <- 1
+#' for (i in 2:nrow(dat)){
+#'   if (dat$site[i-1] != dat$site[i]) caps[i] = i
+#'   if (dat$image_type[i-1] != dat$image_type[i]) caps[i] = i
+#'   else (if (dat$species[i-1] != dat$species[i]) caps[i] = i
+#'         else (if (difftime(dat$date_time[i], dat$date_time[i-1], units = c("mins")) >= 10) caps[i] = i
+#'               else caps[i] = caps[i-1]))
+#' }
+#' 
+#' caps <- as.factor(caps)
+#' 
+#' #'  Add new column to larger data set
+#' capdata <- cbind(as.data.frame(dat), caps)
+#' 
+#' #'  Retain only the first image from each unique detection event
+#' detect <- capdata %>%
+#'   group_by(caps) %>%
+#'   slice(1L) %>%
+#'   ungroup() %>%
+#'   dplyr::select(-c(caps)) %>%
+#'   group_by(image_no, site, date_time) %>%
+#'   pivot_wider(names_from = species, values_from = detection)
+#' 
+#' ## create new dataframe with detection info
+#' camera_dat_image_set <- camera_dat_all_images %>%
+#'   dplyr::select(-c(detection, SCMU, CORA)) %>%
+#'   full_join(detect, by = c("image_no", "site", "date_time", "image_type")) %>%
+#'   replace(is.na(.), 0) # replace NA values with 0
+#' 
+#' ## export csv
+#' # write.csv(camera_dat_image_set, here("data", "camera_dat_image_set.csv"), row.names = FALSE)
+#' 
+#' ## create hourly detection data
+#' hourly_det <- camera_dat_image_set %>%
+#'   dplyr::select(site, cam_id, date, jday, hour, tod, image_type, SCMU, CORA) %>%
+#'   group_by(site, cam_id, date, hour, image_type) %>%
+#'   mutate(SCMU_hourly_det = ifelse(any(SCMU == 1), 1, 0),
+#'          CORA_hourly_det = ifelse(any(CORA == 1), 1, 0)) %>%
+#'   group_by(site, cam_id, date, hour, tod, image_type) %>%
+#'   slice(1L) %>%
+#'   dplyr::select(site, cam_id, date, jday, hour, tod, image_type, SCMU_hourly_det, CORA_hourly_det)
+#' 
+#' ## export csv
+#' # write.csv(hourly_det, here("data", "camera_hourly_det.csv"), row.names = FALSE)
