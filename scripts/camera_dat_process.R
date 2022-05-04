@@ -147,6 +147,8 @@ camera_dat_all_images <- dat5 %>%
   dplyr::select(image_no, site, cam_id, date, time, date_time, year, month, day, jday, hour, min, sec, tod, image_type, detection,
                 SCMU, CORA)
 
+# write.csv(camera_dat_all_images, here("data", "camera_dat_all_images.csv"), row.names = FALSE)
+
 ## create dataframe for analysis
 cam_mod<-camera_dat_all_images%>%
   dplyr::select(site, cam_id, date, jday, hour, tod, image_type, SCMU, CORA) %>%
@@ -159,12 +161,12 @@ cam_mod<-camera_dat_all_images%>%
   ungroup() %>%
   dplyr::select(site, cam_id, date, jday, hour, tod, 
                 image_type, photo_count, SCMU_hourly_det, 
-                CORA_hourly_det)%>%
-  complete(site, cam_id, date, jday, hour, tod, image_type, 
+                CORA_hourly_det) %>%
+  complete(nesting(site, cam_id, date, jday, hour, tod), image_type,
            fill = list(photo_count = 0, SCMU_hourly_det = 0, CORA_hourly_det =0))
 
+# write.csv(cam_mod, here("data", "camera_mod.csv"), row.names = FALSE)
 
-# write.csv(camera_dat_all_images, here("data", "camera_dat_all_images.csv"), row.names = FALSE)
 #' 
 #' ## extract independent detections (set at 10 minutes, code from Sarah B. Bassing) for image set
 #' dat <- camera_dat_all_images %>%
