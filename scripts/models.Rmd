@@ -25,7 +25,7 @@ library(here)
 library(lme4)
 
 ## load data
-camera_hourly <- read.csv(here("data", "camera_mod.csv"))
+camera_hourly <- read.csv(here("data", "camera_hourly_mod.csv"))
 acoustic <- read.csv(here("data", "acoustic", "acoustic_cam_tod.csv")) 
 ```
 # Camera Trap Data 
@@ -41,8 +41,11 @@ Binomial generalized linear mixed model to understand effect of image type (moti
 #image_type + photo_count %in% image_type
 #image_type + image_type : photo_count
 #image_type + image_type : I(log(photo_count)) 
-
-m1 <- glmer(SCMU_hourly_det ~ image_type + image_type:photo_count + tod + jday + jday^2 + 
+camera_hourly$l.photocount<-log(camera_hourly$photo_count)
+m1 <- glmer(SCMU_hourly_det ~ image_type + tod + jday + jday^2 + 
+              (1 | cam_id), 
+            data = camera_hourly, family = binomial)
+m1.5 <- glmer(SCMU_hourly_det ~ image_type + image_type : l.photocount + tod + jday + jday^2 + 
               (1 | cam_id), 
             data = camera_hourly, family = binomial)
 summary(m1)
