@@ -27,6 +27,8 @@ library(lme4)
 ## load data
 camera_hourly <- read.csv(here("data", "camera_hourly_mod.csv"))
 acoustic <- read.csv(here("data", "acoustic", "acoustic_cam_tod.csv")) 
+
+#camera_hourly[intersect(which(camera_hourly$image_type == "timelapse"),which(camera_hourly$photo_count < 6))   ]
 ```
 # Camera Trap Data 
 
@@ -41,14 +43,20 @@ Binomial generalized linear mixed model to understand effect of image type (moti
 #image_type + photo_count %in% image_type
 #image_type + image_type : photo_count
 #image_type + image_type : I(log(photo_count)) 
-camera_hourly$l.photocount<-log(camera_hourly$photo_count)
-m1 <- glmer(SCMU_hourly_det ~ image_type + tod + jday + jday^2 + 
-              (1 | cam_id), 
-            data = camera_hourly, family = binomial)
-m1.5 <- glmer(SCMU_hourly_det ~ image_type + image_type : l.photocount + tod + jday + jday^2 + 
+#I have standardized jday so that we don't have numerical problems when running jday^2 
+
+camera_hourly$jday.stand  <- (camera_hourly$jday - mean(camera_hourly$jday))/sd(camera_hourly$jday)
+
+
+m1 <- glmer(SCMU_hourly_det ~ image_type + tod + jday.stand + I(jday.stand^2) + 
               (1 | cam_id), 
             data = camera_hourly, family = binomial)
 summary(m1)
+
+m1.5 <- glmer(SCMU_hourly_det ~ image_type + image_type : photocount + tod + jday.stand + I(jday.stand^2) +
+              (1 | cam_id), 
+            data = camera_hourly, family = binomial)
+summary(m1.5)
 
 ## day of year as a quadratic
 # plot(camera_hourly$jday, camera_hourly$jday) 
@@ -59,7 +67,9 @@ summary(m1)
 ## Model #2: CORA Camera Detections
 Binomial generalized linear mixed model to understand effect of image type (motion-capture versus timelapse), time of day (dawn, day, dusk) and time of year (julian day, quadratic effect) plus random effect of camera id (n = 7) on ability to detect ravens within one-hour time periods. 
 ```{r mod2}
-m2 <- glmer(CORA_hourly_det ~ image_type + image_type:photo_count + tod + jday + jday^2 + (1 | cam_id), 
+m2 <- glmer(CORA_hourly_det ~ image_type + image_type:photo_count + tod + jday.stand + I(jday.stand^2) + (1 | cam_id), 
+            data = camera_hourly, family = binomial)
+m2.5 <- glmer(CORA_hourly_det ~ image_type + tod + jday.stand + I(jday.stand^2) + (1 | cam_id), 
             data = camera_hourly, family = binomial)
 summary(m2)
 
@@ -99,10 +109,14 @@ Binomial generalized linear mixed model to understand effect of time since camer
 ```{r m5}
 acoustic <- acoustic %>% mutate(time_int = ifelse(time_int == "during", "aduring", time_int))
 
-m5 <- glmer(SCMU ~ time_int + tod + jday + jday^2 + #distance + 
+#I have standardized jday so that we don't have numerical problems when running jday^2 
+acoustic$jday.stand  <- (acoustic$jday - mean(acoustic$jday))/sd(acoustic$jday)
+
+m5 <- glmer(SCMU ~ time_int + tod + jday.stand + I(jday.stand^2) + #distance + 
               (1 | cam_id), 
             data = acoustic, family = binomial)
 summary(m5)
+
 
 ```
 
@@ -111,7 +125,7 @@ Binomial generalized linear mixed model to understand effect of time since camer
 ```{r m6}
 cora <- acoustic %>% filter(CORA == 1) # there are only 26 CORA acoustic detections!
 
-m6 <- glmer(CORA ~ time_int + tod + jday + jday^2 + #distance +
+m6 <- glmer(CORA ~ time_int + tod + jday.stand + I(jday.stand^2) + #distance +
                (1 | cam_id),
              data = acoustic, family = binomial)
  summary(m6)
