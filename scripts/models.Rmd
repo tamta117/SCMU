@@ -71,7 +71,7 @@ m2 <- glmer(CORA_hourly_det ~ image_type + image_type:photo_count + tod + jday.s
             data = camera_hourly, family = binomial)
 m2.5 <- glmer(CORA_hourly_det ~ image_type + tod + jday.stand + I(jday.stand^2) + (1 | cam_id), 
             data = camera_hourly, family = binomial)
-summary(m2)
+summary(m2.5)
 
 ```
 
@@ -110,7 +110,7 @@ Binomial generalized linear mixed model to understand effect of time since camer
 acoustic <- acoustic %>% mutate(time_int = ifelse(time_int == "during", "aduring", time_int))
 
 #I have standardized jday so that we don't have numerical problems when running jday^2 
-acoustic$jday.stand  <- (acoustic$jday - mean(acoustic$jday))/sd(acoustic$jday)
+acoustic$jday.stand  <- (acoustic$jday - mean(acoustic$jday)) / sd(acoustic$jday)
 
 m5 <- glmer(SCMU ~ time_int + tod + jday.stand + I(jday.stand^2) + #distance + 
               (1 | cam_id), 

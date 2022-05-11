@@ -232,29 +232,33 @@ acoustic_cam$hr<-as.numeric(acoustic_cam$hr)
 acoustic_cam1<-acoustic_cam%>%
   subset(acoustic_cam$date<="2021-03-15")%>%
   mutate(tod=case_when(
-    hr<=6~"dawn",
-    hr>=7 & hr<=16 ~ "day",
-    hr>=17~"dusk"))
+    hr<=4 | hr>=19~"night",
+    hr>=5 & hr<=7 ~ "dawn",
+    hr>=8 & hr<=15 ~ "day",
+    hr>=16 & hr<=18 ~ "dusk"))
 acoustic_cam2<-acoustic_cam%>%
   subset(acoustic_cam$date>="2021-03-16" & 
            acoustic_cam$date<="2021-05-01")%>%
   mutate(tod=case_when(
-    hr<=5~"dawn",
-    hr>=6 & hr<=17 ~ "day",
-    hr>=18~"dusk"))
+    hr<=3 | hr>=20~"night",
+    hr>=4 & hr<=6 ~ "dawn",
+    hr>=7 & hr<=16 ~ "day",
+    hr>=17 & hr<=19 ~ "dusk"))
 acoustic_cam3<-acoustic_cam%>%
   subset(acoustic_cam$date>="2021-05-02" & 
            acoustic_cam$date<="2021-05-30")%>%
   mutate(tod=case_when(
-    hr<=4~"dawn",
-    hr>=5 & hr<=17 ~ "day",
-    hr>=18~"dusk"))
+    hr<=2 | hr>=20~"night",
+    hr>=3 & hr<=5 ~ "dawn",
+    hr>=6 & hr<=16 ~ "day",
+    hr>=17 & hr<=19 ~ "dusk"))
 acoustic_cam4<-acoustic_cam%>%
   subset(acoustic_cam$date>="2021-05-31")%>%
   mutate(tod=case_when(
-    hr<=4~"dawn",
-    hr>=5 & hr<=18 ~ "day",
-    hr>=19~"dusk"))
+    hr<=2 | hr>=21~"night",
+    hr>=3 & hr<=5 ~ "dawn",
+    hr>=6 & hr<=17 ~ "day",
+    hr>=18 & hr<=20 ~ "dusk"))
 acoustic_cam5<-bind_rows(acoustic_cam1,acoustic_cam2,
                          acoustic_cam3,acoustic_cam4)
 write_csv(acoustic_cam5,here("data/acoustic/acoustic_cam_tod.csv"))
