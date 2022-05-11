@@ -14,6 +14,7 @@ output: pdf_document
 # add 0 for motion
 # add log(photo count)
 # filter for timelapse for acoustic models
+# table of deployment dates
 
 
 ```{r setup, include=FALSE}
@@ -29,6 +30,10 @@ camera_hourly <- read.csv(here("data", "camera_hourly_mod.csv"))
 acoustic <- read.csv(here("data", "acoustic", "acoustic_cam_tod.csv")) 
 
 #camera_hourly[intersect(which(camera_hourly$image_type == "timelapse"),which(camera_hourly$photo_count < 6))   ]
+
+# table(camera_hourly$photo_count, camera_hourly$image_type)
+chk <- camera_hourly %>%
+  filter(image_type == "timelapse" & photo_count != 6)
 ```
 # Camera Trap Data 
 
