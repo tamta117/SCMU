@@ -1,8 +1,10 @@
-## Efficacy of remote monitoring tools in the detection of predation events on a rare seabird
+# Efficacy of remote monitoring tools in the detection of predation events on a rare seabird
 
 ### TO DO
 clean-up acoustic and camera data files; remove unnecessary data  
 explain acoustic data process (e.g., 10 minutes on either side)
+
+===================================
 
 This repository contains pre-processed camera trap and acoustic monitoring data at 5 breeding locations for Scripps's murrelets *Synthliboramphus scrippsi* at Anacapa Island in Channel Islands National Park. Units were deployed during the breeding season (~February to June) in 2021 and 2022. 
 
@@ -28,11 +30,14 @@ This repository contains the following files:
 2. Moss Cave, West Anacapa Island (2 cameras, 1 acoustic device)   
 
 3. Lava Bench #1 Cave, Middle Anacapa Island (1 camera, 1 acoustic device)  
-
+]p'l,./
 4. Lava Bench #2 Cave, Middle Anacapa Island (1 camera, 1 acoustic device)    
 
 5. Refuge Cave, Middle Anacapa Island (1 camera, 1 acoustic device)    
 
 
-### Technical Gear
+### Technical Specifications
+Acoustic data was recorded on Wildlife Acoustic Song Meter SM4 units. Units were programmed to record one minute of audio every ten minutes for 24 hours/day.  
+
+Camera data was recorded by Reconyx HyperFire 900 units. Units were programmed for motion-activated and timelapse images. Motion-activated settings were programmed to "agressive"" (5 pictures per trigger, RapidFire, 0 sec quiet period between triggers). Timelapse settings were programmed to take one image every 10 minutes. Cameras were programmed to run 24 hours/day. 
 
