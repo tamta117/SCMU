@@ -2397,7 +2397,7 @@
 "Lava1","cam_01",2021-04-01,91,10,"day","timelapse",6,0,0
 "Lava1","cam_01",2021-04-01,91,11,"day","motion",0,0,0
 "Lava1","cam_01",2021-04-01,91,11,"day","timelapse",6,0,0
-"Lava1","cam_01",2021-04-01,91,12,"day","motion",13,0,0
+"Lava1","cam_01",2021-04-01,91,12,"day","motion",11,0,0
 "Lava1","cam_01",2021-04-01,91,12,"day","timelapse",3,0,0
 "Lava1","cam_01",2021-04-01,91,16,"day","motion",0,0,0
 "Lava1","cam_01",2021-04-01,91,16,"day","timelapse",1,0,0
@@ -4530,9 +4530,9 @@
 "Lava1","cam_01",2021-05-16,136,2,"night","motion",0,0,0
 "Lava1","cam_01",2021-05-16,136,2,"night","timelapse",6,0,0
 "Lava1","cam_01",2021-05-16,136,3,"dawn","motion",0,0,0
-"Lava1","cam_01",2021-05-16,136,3,"dawn","timelapse",12,0,0
+"Lava1","cam_01",2021-05-16,136,3,"dawn","timelapse",6,0,0
 "Lava1","cam_01",2021-05-16,136,4,"dawn","motion",0,0,0
-"Lava1","cam_01",2021-05-16,136,4,"dawn","timelapse",10,0,0
+"Lava1","cam_01",2021-05-16,136,4,"dawn","timelapse",6,0,0
 "Lava1","cam_01",2021-05-16,136,5,"dawn","motion",0,0,0
 "Lava1","cam_01",2021-05-16,136,5,"dawn","timelapse",6,1,0
 "Lava1","cam_01",2021-05-16,136,6,"day","motion",0,0,0
@@ -11366,9 +11366,9 @@
 "Moss","cam_03",2021-02-23,54,11,"day","motion",0,0,0
 "Moss","cam_03",2021-02-23,54,11,"day","timelapse",6,0,0
 "Moss","cam_03",2021-02-23,54,12,"day","motion",0,0,0
-"Moss","cam_03",2021-02-23,54,12,"day","timelapse",7,0,0
+"Moss","cam_03",2021-02-23,54,12,"day","timelapse",6,0,0
 "Moss","cam_03",2021-02-23,54,13,"day","motion",0,0,0
-"Moss","cam_03",2021-02-23,54,13,"day","timelapse",10,0,0
+"Moss","cam_03",2021-02-23,54,13,"day","timelapse",6,0,0
 "Moss","cam_03",2021-02-23,54,14,"day","motion",0,0,0
 "Moss","cam_03",2021-02-23,54,14,"day","timelapse",6,0,0
 "Moss","cam_03",2021-02-23,54,15,"day","motion",0,0,0
@@ -25498,7 +25498,7 @@
 "Pinnacle","cam_05",2021-06-08,159,16,"day","motion",0,0,0
 "Pinnacle","cam_05",2021-06-08,159,16,"day","timelapse",6,0,0
 "Pinnacle","cam_05",2021-06-08,159,17,"day","motion",0,0,0
-"Pinnacle","cam_05",2021-06-08,159,17,"day","timelapse",7,0,0
+"Pinnacle","cam_05",2021-06-08,159,17,"day","timelapse",6,0,0
 "Pinnacle","cam_05",2021-06-08,159,18,"dusk","motion",0,0,0
 "Pinnacle","cam_05",2021-06-08,159,18,"dusk","timelapse",6,0,0
 "Pinnacle","cam_05",2021-06-08,159,19,"dusk","motion",0,0,0
@@ -34036,9 +34036,9 @@
 "Refuge","cam_07",2021-03-19,78,10,"day","motion",0,0,0
 "Refuge","cam_07",2021-03-19,78,10,"day","timelapse",6,0,0
 "Refuge","cam_07",2021-03-19,78,11,"day","motion",0,0,0
-"Refuge","cam_07",2021-03-19,78,11,"day","timelapse",11,0,0
+"Refuge","cam_07",2021-03-19,78,11,"day","timelapse",6,0,0
 "Refuge","cam_07",2021-03-19,78,12,"day","motion",0,0,0
-"Refuge","cam_07",2021-03-19,78,12,"day","timelapse",10,0,0
+"Refuge","cam_07",2021-03-19,78,12,"day","timelapse",6,0,0
 "Refuge","cam_07",2021-03-19,78,13,"day","motion",0,0,0
 "Refuge","cam_07",2021-03-19,78,13,"day","timelapse",6,0,0
 "Refuge","cam_07",2021-03-19,78,14,"day","motion",0,0,0
@@ -34232,9 +34232,9 @@
 "Refuge","cam_07",2021-03-23,82,12,"day","motion",0,0,0
 "Refuge","cam_07",2021-03-23,82,12,"day","timelapse",6,0,0
 "Refuge","cam_07",2021-03-23,82,13,"day","motion",0,0,0
-"Refuge","cam_07",2021-03-23,82,13,"day","timelapse",7,0,0
+"Refuge","cam_07",2021-03-23,82,13,"day","timelapse",6,0,0
 "Refuge","cam_07",2021-03-23,82,14,"day","motion",0,0,0
-"Refuge","cam_07",2021-03-23,82,14,"day","timelapse",8,0,0
+"Refuge","cam_07",2021-03-23,82,14,"day","timelapse",6,0,0
 "Refuge","cam_07",2021-03-23,82,15,"day","motion",0,0,0
 "Refuge","cam_07",2021-03-23,82,15,"day","timelapse",6,0,0
 "Refuge","cam_07",2021-03-23,82,16,"day","motion",0,0,0

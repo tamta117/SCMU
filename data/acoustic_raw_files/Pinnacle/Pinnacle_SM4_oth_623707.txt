@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Delta Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin Path	File Offset (s)	Begin File	Species	Comments
+1	Spectrogram 1	1	58394.172641915	58394.943451696	0.7708	62.500	1875.000	D:\AI_SCMU\2021\Audio\Pinnacle\SM4\6_23_21 to 7_7_21\Data\PWR05_20210630_060000.wav	14.1726	PWR05_20210630_060000.wav	U	10 minutes after raptor visit
+2	Spectrogram 1	1	58398.597090057	58399.383316033	0.7862	0.000	1812.500	D:\AI_SCMU\2021\Audio\Pinnacle\SM4\6_23_21 to 7_7_21\Data\PWR05_20210630_060000.wav	18.5971	PWR05_20210630_060000.wav	U	10 minutes after raptor visit
+3	Spectrogram 1	1	58402.358641787	58403.175700154	0.8171	0.000	1750.000	D:\AI_SCMU\2021\Audio\Pinnacle\SM4\6_23_21 to 7_7_21\Data\PWR05_20210630_060000.wav	22.3586	PWR05_20210630_060000.wav	U	10 minutes after raptor visit
+4	Spectrogram 1	1	58410.432140930	58411.017956363	0.5858	0.000	1500.000	D:\AI_SCMU\2021\Audio\Pinnacle\SM4\6_23_21 to 7_7_21\Data\PWR05_20210630_060000.wav	30.4321	PWR05_20210630_060000.wav	U	10 minutes after raptor visit
+5	Spectrogram 1	1	58423.879734198	58424.218890502	0.3392	0.000	1375.000	D:\AI_SCMU\2021\Audio\Pinnacle\SM4\6_23_21 to 7_7_21\Data\PWR05_20210630_060000.wav	43.8798	PWR05_20210630_060000.wav	U	10 minutes after raptor visit

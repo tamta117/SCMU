@@ -11,9 +11,12 @@ This repository contains pre-processed camera trap and acoustic monitoring data 
 This repository contains the following files:  
 
 1. Data   
-    + the `acoustic` folder contains the pre-processed acoustic data in text files by each breeding location. Data is grouped by site and files are split into murrelet and raven positive detections. Acoustic data was processed using Raven Pro software. 
-    + the `camera` folder contains the pre-processed camera data in csv files by each breeding location. Data files contain one record per image, including detection and non-detection data. Camera data was processed using Timelapse software.  
-    + 
+    + the `acoustic_raw_files` folder contains the pre-processed acoustic data in text files by each breeding location. Data is grouped by site and files are split into murrelet and raven positive detections. Acoustic data was processed using Raven Pro software. 
+    + the `camera_raw_files` folder contains the pre-processed camera data in csv files by each breeding location. Data files contain one record per image, including detection and non-detection data. Camera data was processed using Timelapse software.  
+    + `camera_raw_dat.csv` is the raw version of the camera data; it contains all image records. 
+    + `camera_dat_full.csv`is the cleaned version of the camera data; it contains all image records. 
+    + `camera_dat_all_images.csv` is a slimmed down version with CORA and SCMU detections only.  
+    + `camera_hourly_mod.csv` is the dataset used in the analysis.  
     + `ai_scmu_sites.csv` contains GPS latitude/longitude coordinates for the 5 breeding locations.  
 
 2. Scripts  
@@ -30,7 +33,7 @@ This repository contains the following files:
 2. Moss Cave, West Anacapa Island (2 cameras, 1 acoustic device)   
 
 3. Lava Bench #1 Cave, Middle Anacapa Island (1 camera, 1 acoustic device)  
-]p'l,./
+
 4. Lava Bench #2 Cave, Middle Anacapa Island (1 camera, 1 acoustic device)    
 
 5. Refuge Cave, Middle Anacapa Island (1 camera, 1 acoustic device)    
@@ -39,5 +42,5 @@ This repository contains the following files:
 ### Technical Specifications
 Acoustic data was recorded on Wildlife Acoustic Song Meter SM4 units. Units were programmed to record one minute of audio every ten minutes for 24 hours/day.  
 
-Camera data was recorded by Reconyx HyperFire 900 units. Units were programmed for motion-activated and timelapse images. Motion-activated settings were programmed to "agressive"" (5 pictures per trigger, RapidFire, 0 sec quiet period between triggers). Timelapse settings were programmed to take one image every 10 minutes. Cameras were programmed to run 24 hours/day. 
+Camera data was recorded by Reconyx HyperFire 2 IR units. Units were programmed for motion-activated and timelapse images. Motion-activated settings were programmed to "agressive"" (5 pictures per trigger, RapidFire, 0 sec quiet period between triggers). Timelapse settings were programmed to take one image every 10 minutes. Cameras were programmed to run 24 hours/day. 
 
