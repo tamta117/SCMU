@@ -26,6 +26,7 @@ This repository contains the following files:
     + `map_site.R` creates a study site map.  
     + `graph_acoustic_data.R` is used to generate plots using model results for acoustic data.  
     + `graph_camera_data.R` is used to generate plots using model results for camera data.  
+    + `deployment_dates_plot.R` is used to generate a plot of deployment dates for acoustic units and camera traps.  
     
 ### Sites
 1. Pinnacle Cave, West Anacapa Island (2 cameras, 1 acoustic device)  

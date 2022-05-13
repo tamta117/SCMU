@@ -15,6 +15,7 @@ output: pdf_document
 # add log(photo count)
 # filter for timelapse for acoustic models
 # table of deployment dates
+# add readme files
 
 
 ```{r setup, include=FALSE}
@@ -34,6 +35,9 @@ acoustic <- read.csv(here("data", "acoustic", "acoustic_cam_tod.csv"))
 # table(camera_hourly$photo_count, camera_hourly$image_type)
 chk <- camera_hourly %>%
   filter(image_type == "timelapse" & photo_count != 6)
+
+full <- read.csv(here("data", "camera_dat_all_images.csv"))
+timelapse <- full %>% filter(image_type == "timelapse")
 ```
 # Camera Trap Data 
 
