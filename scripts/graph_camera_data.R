@@ -8,16 +8,16 @@ library(ggplot2)
 camera_hourly <- read.csv(here("data", "camera_hourly_mod.csv"))
 camera.m <- camera_hourly%>%
   select(hour,jday,SCMU_hourly_det,tod,image_type)%>%
-  #group_by(hour)%>%
+  group_by(hour)%>%
   #group_by(jday)%>%
-  group_by(tod)%>%
+  #group_by(tod)%>%
   #group_by(image_type)%>%
   summarize(m=sum(SCMU_hourly_det))
 camera.r <- camera_hourly%>%
   select(hour,jday,CORA_hourly_det,tod,image_type)%>%
-  #group_by(hour)%>%
+  group_by(hour)%>%
   #group_by(jday)%>%
-  group_by(tod)%>%
+  #group_by(tod)%>%
   #group_by(image_type)%>%
   summarize(r=sum(CORA_hourly_det))
 camera.plot<-left_join(camera.m,camera.r)
@@ -31,6 +31,7 @@ ggplot(camera.plot1)+
            position = position_dodge(0.9))+
   xlab("Hour of the day")+
   ylab("Number of detection")+
+  ylim(0,250)+
   scale_fill_manual(values = c("#4869b1","#ffb172"), name = "Species",
                     labels=c("Murrelet","Raven"))
 ggsave(here("figures/camera.hr.png"),dpi=300)
