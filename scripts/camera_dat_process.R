@@ -61,15 +61,16 @@ refuge <-
          cam_id = c("cam_07")) %>%
   dplyr::select(Site, everything())
 
-## combine into one dataframe, one row per camera observation
+## combine into one dataframe, one row per camera observation, remove duplicates
 camera_raw_dat <- rbind(lava1, lava2, moss, pinnacle, refuge) %>%
   mutate(Date = as_date(Date, format = "%d-%b-%Y"),
          Adult = as.integer(Adult),
          Offspring = as.integer(Offspring),
-         Count = as.integer(Count))
+         Count = as.integer(Count)) %>%
+  filter(str_detect(File, fixed('('), negate = TRUE))
 
 ## export csv with all camera observations (not cleaned)
-# write.csv(camera_raw_dat, here("Data", "camera", "camera_raw_dat.csv"), row.names = FALSE)
+#write.csv(camera_raw_dat, here("data", "camera_raw_dat.csv"), row.names = FALSE)
 nrow(camera_raw_dat) # total observations/attempts
 
 ## clean dataframe and reformat
@@ -144,7 +145,7 @@ dat5<-bind_rows(dat1, dat2, dat3, dat4) %>%
   dplyr::select(folder, relative_path, file, image_no, site, cam_id, date_time, date, time,
                 year, month, day, jday, hour, min, sec, tod, everything())
 
-# write.csv(dat5, here("data", "camera", "camera_dat_full.csv"), row.names = FALSE)
+# write.csv(dat5, here("data", "camera_dat_full.csv"), row.names = FALSE)
 
 ## create dataframe for SCMU and CORA with all images 
 camera_dat_all_images <- dat5 %>%
@@ -152,6 +153,9 @@ camera_dat_all_images <- dat5 %>%
                 SCMU, CORA)
 
 # write.csv(camera_dat_all_images, here("data", "camera_dat_all_images.csv"), row.names = FALSE)
+
+## load deployment data
+deploy <- read.csv(here("data", "deployment_data.csv"), sep = ";")
 
 ## create dataframe for analysis
 cam_mod<-camera_dat_all_images%>%

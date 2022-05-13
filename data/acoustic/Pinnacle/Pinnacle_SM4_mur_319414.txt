@@ -1,2 +1,0 @@
-Selection	View	Channel	Begin Time (s)	End Time (s)	Delta Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin Path	File Offset (s)	Begin File	Species	Comments
-1	Spectrogram 1	1	7.816000000	14.614542266	6.7985	1812.500	6250.000	D:\AI_SCMU\2021\Audio\Pinnacle\SM4\3_19_21 to 4_14_21\Data\PWR05_20210409_053000.wav	7.8160	PWR05_20210409_053000.wav	M	AI
