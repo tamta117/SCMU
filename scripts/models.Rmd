@@ -61,14 +61,13 @@ m1 <- glmer(SCMU_hourly_det ~ image_type + tod + jday.stand + I(jday.stand^2) +
               (1 | cam_id), 
             data = camera_hourly, family = binomial)
 summary(m1)
-confint(m1,level=0.95)
+confint(m1, method="Wald")
 exp(confint.default(m1))
 
 m1.5 <- glmer(SCMU_hourly_det ~ image_type + image_type : photocount + tod + jday.stand + I(jday.stand^2) +
               (1 | cam_id), 
             data = camera_hourly, family = binomial)
 summary(m1.5)
-
 ## day of year as a quadratic
 # plot(camera_hourly$jday, camera_hourly$jday) 
 # plot(camera_hourly$jday, camera_hourly$jday + camera_hourly$jday^2)
@@ -83,6 +82,7 @@ m2 <- glmer(CORA_hourly_det ~ image_type + image_type:photo_count + tod + jday.s
 m2.5 <- glmer(CORA_hourly_det ~ image_type + tod + jday.stand + I(jday.stand^2) + (1 | cam_id), 
             data = camera_hourly, family = binomial)
 summary(m2.5)
+confint(m2.5, method="Wald")
 
 ```
 
@@ -124,14 +124,10 @@ acoustic <- acoustic %>% mutate(time_int = ifelse(time_int == "during", "aduring
 acoustic$jday.stand  <- (acoustic$jday - mean(acoustic$jday)) / sd(acoustic$jday)
 
 m5 <- glmer(SCMU ~ time_int + tod + jday.stand + I(jday.stand^2) + 
-              (1 | cam_id),data = acoustic, family = binomial)
+              (1 | cam_id), data = acoustic, family = binomial)
 summary(m5)
 confint(m5,method="Wald")
 confint(m5,method="boot")
-
-ilink <- family(m5)$linkinv
-ndata <- bind_cols(acoustic, setNames(as_tibble(predict(
-  m5, acoustic, se.fit = TRUE)[1:2]),c('fit_link','se_link')))
 ```
 
 ## Model #6: CORA Acoustic Detections
