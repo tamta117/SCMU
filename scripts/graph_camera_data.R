@@ -26,12 +26,14 @@ camera.plot1<-pivot_longer(camera.plot,cols=c("m","r"),names_to = "species",
 
 #### graph 1 ####
 ggplot(camera.plot1)+
+  geom_rect(data = band, aes(xmin = xstart, xmax = xend, 
+                             ymin = 0, ymax = Inf), 
+            alpha = 0.4)+
   geom_bar(aes(x=hour,y=nobs,fill=as.factor(species)),
            stat = "identity", 
            position = position_dodge(0.9))+
   xlab("Hour of the day")+
   ylab("Number of detection")+
-  ylim(0,250)+
   scale_fill_manual(values = c("#4869b1","#ffb172"), name = "Species",
                     labels=c("Murrelet","Raven"))
 ggsave(here("figures/camera.hr.png"),dpi=300)
