@@ -25,8 +25,6 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(here)
 library(lme4)
-library(MuMIn)
-library(jtools)
 
 ## load data
 camera_hourly <- read.csv(here("data", "camera_hourly_mod.csv"))
