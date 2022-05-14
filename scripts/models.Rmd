@@ -58,6 +58,7 @@ m1 <- glmer(SCMU_hourly_det ~ image_type + tod + jday.stand + I(jday.stand^2) +
             data = camera_hourly, family = binomial)
 summary(m1)
 confint(m1,level=0.95)
+exp(confint.default(m1))
 
 m1.5 <- glmer(SCMU_hourly_det ~ image_type + image_type : photocount + tod + jday.stand + I(jday.stand^2) +
               (1 | cam_id), 
@@ -118,12 +119,15 @@ acoustic <- acoustic %>% mutate(time_int = ifelse(time_int == "during", "aduring
 #I have standardized jday so that we don't have numerical problems when running jday^2 
 acoustic$jday.stand  <- (acoustic$jday - mean(acoustic$jday)) / sd(acoustic$jday)
 
-m5 <- glmer(SCMU ~ time_int + tod + jday.stand + I(jday.stand^2) + #distance + 
-              (1 | cam_id), 
-            data = acoustic, family = binomial)
+m5 <- glmer(SCMU ~ time_int + tod + jday.stand + I(jday.stand^2) + 
+              (1 | cam_id),data = acoustic, family = binomial)
 summary(m5)
+confint(m5,method="Wald")
+confint(m5,method="boot")
 
-
+ilink <- family(m5)$linkinv
+ndata <- bind_cols(acoustic, setNames(as_tibble(predict(
+  m5, acoustic, se.fit = TRUE)[1:2]),c('fit_link','se_link')))
 ```
 
 ## Model #6: CORA Acoustic Detections
