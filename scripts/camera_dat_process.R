@@ -12,7 +12,7 @@ library(janitor)
 
 ## load raw data files from Timelapse
 lava1 <-
-  list.files(path = here("data", "camera", "Lava1"),
+  list.files(path = here("data", "camera_raw_files", "Lava1"),
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
@@ -22,7 +22,7 @@ lava1 <-
   dplyr::select(Site, everything())
 
 lava2 <-
-  list.files(path = here("Data", "camera", "Lava2"),
+  list.files(path = here("Data", "camera_raw_files", "Lava2"),
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
@@ -32,7 +32,7 @@ lava2 <-
   dplyr::select(Site, everything())
 
 moss <-
-  list.files(path = here("Data", "camera", "Moss"),
+  list.files(path = here("Data", "camera_raw_files", "Moss"),
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
@@ -42,7 +42,7 @@ moss <-
   dplyr::select(Site, everything())
 
 pinnacle <-
-  list.files(path = here("Data", "camera", "Pinnacle"),
+  list.files(path = here("Data", "camera_raw_files", "Pinnacle"),
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
@@ -52,7 +52,7 @@ pinnacle <-
   dplyr::select(Site, everything())
 
 refuge <-
-  list.files(path = here("Data", "camera", "Refuge"),
+  list.files(path = here("Data", "camera_raw_files", "Refuge"),
              pattern = "*.csv", 
              full.names = T) %>% 
   map_df(~read_csv(., col_types = cols(.default = "c"))) %>%
@@ -171,7 +171,12 @@ cam_mod<-camera_dat_all_images%>%
                 image_type, photo_count, SCMU_hourly_det, 
                 CORA_hourly_det) %>%
   complete(nesting(site, cam_id, date, jday, hour, tod), image_type,
-           fill = list(photo_count = 0, SCMU_hourly_det = 0, CORA_hourly_det =0))
+           fill = list(photo_count = 0, SCMU_hourly_det = 0, CORA_hourly_det =0)) %>% 
+  filter(case_when)
+
+lava1_mod <- cam_mod %>%
+  filter(site == "Lava1") %>%
+  filter(date == "2021-04-01" & hour | date == "2021-04-01" & hour)
 
 write.csv(cam_mod, here("data", "camera_hourly_mod.csv"), row.names = FALSE)
 # write.csv(cam_mod, here("data", "camera_mod.csv"), row.names = FALSE)
