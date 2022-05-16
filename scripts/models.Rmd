@@ -61,7 +61,7 @@ m1 <- glmer(SCMU_hourly_det ~ image_type + tod + jday.stand + I(jday.stand^2) +
               (1 | cam_id), 
             data = camera_hourly, family = binomial)
 summary(m1)
-confint(m1, method="Wald")
+;confint(m1, method="Wald")
 
 m1.5 <- glmer(SCMU_hourly_det ~ image_type + image_type : photocount + tod + jday.stand + I(jday.stand^2) +
               (1 | cam_id), 
