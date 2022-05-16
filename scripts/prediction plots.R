@@ -96,6 +96,34 @@ ggplot(jday.bind, aes(x, predicted)) +
   guides(color=guide_legend(override.aes=list(fill=NA)))
 ggsave("figures/pred.cam.bind.jday.png",width=1175,height=749,units="px",dpi=300)
 
+##START NEW PLOTTING CODE## 
+#get label vector for real-scale x-axis 
+min.x <- round(min(camera_hourly$jday),dig=-1)
+max.x <- round(max(camera_hourly$jday),dig=-1)
+int.length <- (max.x-min.x)/5
+x.axis.real <- seq(from=min.x,to=max.x,by=int.length)
+x.axis <- (x.axis.real - mean(camera_hourly$jday))/sd(camera_hourly$jday) 
+#plot
+jday1 <- ggpredict(m2.5, terms = "jday.stand [all]")
+jday1$species<-"Raven"
+jday$species<-"Murrelet"
+jday.bind<-bind_rows(jday1,jday)
+jday.bind$jday<-jday.bind$x*sd(camera_hourly$jday)+mean(camera_hourly$jday)
+ggplot(jday.bind, aes(x, predicted)) + 
+        geom_ribbon(data=jday,aes(ymin=conf.low, ymax=conf.high), alpha=0.15, 
+                    fill="#2f4a8a")+
+        geom_ribbon(data=jday1,aes(ymin=conf.low, ymax=conf.high), alpha=0.15, 
+                    fill="#ffb172")+
+        geom_smooth(aes(col=species))+
+        scale_color_manual(values = c("#4869b1","#ffb172"), name = "Species",
+                           labels=c("Murrelet","Raven"))+
+        labs(x="Day of the year", y="Probability of detection")+
+        theme(legend.background = element_rect(fill="white"))+
+        guides(color=guide_legend(override.aes=list(fill=NA)))+
+        scale_x_continuous(breaks = x.axis, labels = as.character(x.axis.real)) 
+ggsave("figures/pred.cam.bind.jday.png",width=1175,height=749,units="px",dpi=300)
+##END NEW PLOTTING CODE## 
+
 tod1 <- ggpredict(m2.5, terms = "tod")
 tod$species<-"Murrelet"
 tod1$species<-"Raven"
@@ -128,6 +156,24 @@ ggplot(jday2, aes(x, predicted)) +
   geom_ribbon(aes(ymin=conf.low, ymax=conf.high), alpha=0.15, fill="#2f4a8a")+
   labs(x="Day of the year", y="Probability of \n murrelet detection")
 ggsave("figures/pred.acu.jday.png",width=1175,height=749,units="px",dpi=300)
+
+
+##START NEW PLOTTING CODE## 
+#get label vector for real-scale x-axis 
+min.x <- round(min(acoustic$jday),dig=-1)
+max.x <- round(max(acoustic$jday),dig=-1)
+int.length <- (max.x-min.x)/4
+x.axis.real <- seq(from=min.x,to=max.x,by=int.length)
+x.axis <- (x.axis.real - mean(camera_hourly$jday))/sd(camera_hourly$jday) 
+#plot
+jday2 <- ggpredict(m5, terms = "jday.stand [all]")
+ggplot(jday2, aes(x, predicted)) + 
+        geom_smooth(color="#2f4a8a")+
+        geom_ribbon(aes(ymin=conf.low, ymax=conf.high), alpha=0.15, fill="#2f4a8a")+
+        labs(x="Day of the year", y="Probability of \n murrelet detection")+
+        scale_x_continuous(breaks = x.axis, labels = as.character(x.axis.real)) 
+ggsave("figures/pred.acu.jday.png",width=1175,height=749,units="px",dpi=300)
+##END NEW PLOTTING CODE## 
 
 tod1 <- ggpredict(m5, terms = "tod")
 ggplot(tod1, aes(x, predicted)) + 
