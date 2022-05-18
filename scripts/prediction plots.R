@@ -3,6 +3,7 @@
 library(effects)
 library(sjPlot)
 library(ggeffects)
+library(ggplot2)
 
 #camera murrelet
 plot(allEffects(m1),selection=1,xlab="Image type",
@@ -118,7 +119,7 @@ ggplot(jday.bind, aes(x, predicted)) +
         scale_color_manual(values = c("#4869b1","#ffb172"), name = "Species",
                            labels=c("Murrelet","Raven"))+
         labs(x="Day of the year", y="Probability of detection")+
-        theme(legend.background = element_rect(fill="white"))+
+        theme(legend.key = element_rect(fill="white"))+
         guides(color=guide_legend(override.aes=list(fill=NA)))+
         scale_x_continuous(breaks = x.axis, labels = as.character(x.axis.real)) 
 ggsave("figures/pred.cam.bind.jday.png",width=1175,height=749,units="px",dpi=300)
@@ -168,14 +169,14 @@ x.axis <- (x.axis.real - mean(camera_hourly$jday))/sd(camera_hourly$jday)
 #plot
 jday2 <- ggpredict(m5, terms = "jday.stand [all]")
 ggplot(jday2, aes(x, predicted)) + 
-        geom_smooth(color="#2f4a8a")+
+        geom_line(color="#2f4a8a",size=1)+
         geom_ribbon(aes(ymin=conf.low, ymax=conf.high), alpha=0.15, fill="#2f4a8a")+
         labs(x="Day of the year", y="Probability of \n murrelet detection")+
         scale_x_continuous(breaks = x.axis, labels = as.character(x.axis.real)) 
 ggsave("figures/pred.acu.jday.png",width=1175,height=749,units="px",dpi=300)
 ##END NEW PLOTTING CODE## 
 
-tod1 <- ggpredict(m5, terms = "tod")
+tod1 <- ggpredict(m5, terms = "tod [all]")
 ggplot(tod1, aes(x, predicted)) + 
   geom_pointrange(aes(ymin=conf.low, ymax=conf.high),color="#2f4a8a")+
   labs(x="Time of day", y="Probability of \n murrelet detection")+
