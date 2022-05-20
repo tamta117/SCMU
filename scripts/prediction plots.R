@@ -147,7 +147,7 @@ time_dif%>%
 
 ggplot(time_dif, aes(x, predicted)) + 
   geom_pointrange(aes(ymin=conf.low, ymax=conf.high),color="#2f4a8a")+
-  labs(x="Image type", y="Probability of \n murrelet detection")+
+  labs(x="Time difference", y="Probability of \n murrelet detection")+
   scale_x_discrete(limits=c("after","aduring","before"),labels=c("Before","During","After"))
 ggsave("figures/pred.cam.timediff.png",width=1175,height=749,units="px",dpi=300)
 
