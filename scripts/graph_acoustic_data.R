@@ -27,8 +27,7 @@ acoustic.plot1<-pivot_longer(acoustic.plot,cols=c("m","r"),names_to = "species",
 band<-data.frame(xstart=c(4,17), xend=c(6,19),col=letters[1:2])
 ggplot()+
   geom_rect(data = band, aes(xmin = xstart, xmax = xend, 
-                              ymin = 0, ymax = Inf), 
-            alpha = 0.4)+
+                              ymin = 0, ymax = Inf),alpha = 0.4)+
   geom_bar(data=acoustic.plot1,aes(x=hr,y=nobs,fill=as.factor(species)),
            stat = "identity", 
            position = position_dodge(0.9))+
@@ -36,7 +35,7 @@ ggplot()+
   ylab("Number of detection")+
   scale_fill_manual(values = c("#4869b1","#ffb172"), name = "Species",
                     labels=c("Murrelet","Raven"))
-ggsave(here("figures/acoustic.hr.png"),dpi=300)
+ggsave(here("figures/acoustic.hr.png"),width=1175,height=749,units="px",dpi=300)
 
 ggplot(acoustic.plot1)+
   geom_bar(aes(x=jday,y=nobs,fill=as.factor(species)),
